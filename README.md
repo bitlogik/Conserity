@@ -192,6 +192,7 @@ email : project@conserity.org
 
 ## ToDo
 
+* Sanitize data read from remotes
 * Add OSCP stapling
 * Test dl softwares against hardcoded hash and/or signatures
 * Add more HTTP headers

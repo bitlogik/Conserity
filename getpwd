@@ -17,6 +17,7 @@ clientIPs=`cat $1`
 shares=""
 for i in $clientIPs
 do
+# Sanitize data read from curl
   shares="$shares $(curl -s --connect-timeout 8 https://$i)" || :
 done
 echo $(eval "$(dirname $0)/shamir/recover_secret.py $shares")
