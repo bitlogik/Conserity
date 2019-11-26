@@ -101,10 +101,10 @@ If you plan to use the Shamir split secret, you need to define the LinodeAPIKey 
 ```
 export LinodeAPIKey=YOURLINODEAPITOKEN ; history -d $(history 1)
 ```
-Else, you just need a single remote Apache web server.
+Else, you just need a single remote Apache web server (a different server from where you install Conserity).
 
 
-Run Conserity in its directory :
+Run Conserity in the main server :
 
 ```
 ./run-conserity.sh
@@ -136,6 +136,8 @@ Conserity performs the following :
 
 At the end it is advised to reboot, at least to update the kernel version.
 
+If you choose the option to use "one existing remote web server", setup this remote server files as displayed at the end before rebooting.
+
 #### Info
 
 The remote instance names are using an host ID as follow :
@@ -143,8 +145,8 @@ The remote instance names are using an host ID as follow :
 cat /etc/machine-id | sha256sum | cut -c1-8
 ```
 
-For now, the remote instance provider (for automatic Shamir install) is Linode.
-We plan to add many ohters providers such as : 
+For now, the remote instances provider (for automatic Shamir install) is Linode.
+We plan to add many others providers such as : 
 * DigitalOcean
 * Vultr
 * Scaleway
@@ -156,13 +158,13 @@ After running Conserity, you now have an encrypted directory in /home/*USER*/pro
 
 Also, the server is secured with infosec best practices (Web server, SSH, firewall,...)
 
-What does it protect ?
+What does it protect ?  
 Conserity strengthens your server security and encrypts your data on the disk. It protects against :
 * Unauthorized access in your server (more difficult to break in)
-* Data read from the disk, or from any backup, snapshots,...
+* Data read from the disk, or from any backup, disk snapshot,...
 * Spying or wiretapping of the web session of the users (web server is configured for security)
 
-What does it NOT protect ?
+What does it NOT protect ?  
 It does NOT protect against :
 * Authorized legitimate access in the server (rogue employee, accidental deletion,...)
 * A present "hole" in the server used softwares (OpenSSL, nginx,...)
@@ -171,7 +173,7 @@ It does NOT protect against :
 * Data deletion. Conserity is not a backup system. Nevertheless, it helps to backup, since any data in the protected folder is securely encrypted.
 
 Why is my email address needed ?  
-Your email address is asked by certbot for the LetsEncrypt certificate ACME server. This is required to register an account, and useful in the event of server key loss or account compromise, to receive notices about revocation of your certificates.
+Your email address is asked by certbot for the LetsEncrypt certificate ACME server. This is required to register an account, and useful in the event of server key loss or account compromise, also to receive notices about revocation of your certificates.
 
 Why I get a security alert when I connect again on SSH ? Is it an intermediate system in the link spying or analyzing the data link?  
 Absolutely not, you still connect directly to your server SSHd and without anything in the middle. Conserity just generates new SSH keys to be sure the used ones are robust. So the SSH keys are changed and thus eventually triggering an alert about the server has changed its host key.
@@ -193,6 +195,6 @@ email : project@conserity.org
 * Add OSCP stapling
 * Test dl softwares against hardcoded hash and/or signatures
 * Add more HTTP headers
-* Add others web service type : PHP/HTML and WSGI
-* Ubuntu compatibility (also Debian9, and then Fedora/CentOS)
+* Add others web service types : PHP/HTML and WSGI
+* Ubuntu compatibility (also Debian 9, and then Fedora/CentOS/RHEL)
 * Add others VPS providers : Vultr, Scaleway, then DigitalOcean and AWS
