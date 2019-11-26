@@ -83,7 +83,7 @@ Only internal web server for now.
 
 ```
 wget https://codeload.github.com/bitlogik/Conserity/tar.gz/master
-tar -xzf Conserity-master.tar.gz
+tar -xzf master
 cd Conserity-master
 ```
 
