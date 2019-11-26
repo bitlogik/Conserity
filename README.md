@@ -85,6 +85,11 @@ Only internal web server for now.
 wget https://codeload.github.com/bitlogik/Conserity/tar.gz/master
 tar -xzf master
 cd Conserity-master
+chmod +x run-conserity.sh
+chmod +x getpwd
+chmod +x shamir/split_secret.py
+chmod +x shamir/recover_secret.py
+chmod +x vps-drivers/create-linode.sh
 ```
 
 or with git
