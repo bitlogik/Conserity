@@ -69,14 +69,21 @@ fi
 
 IPHOST=$(ip route get 1 | sed -n 's/^.*src \([0-9.]*\) .*$/\1/p')
 
+cmd_prt "Quick install for DNS check"
+echo ""
+apt-get -y update > $conserity_log_file
+apt-get -y install dnsutils >> $conserity_log_file
+ok
+
 # Users and Server Parameters
 
 # ToDo check inputs
 
+echo ""
 echo 'Input the host web domain of this server (DNS A to the server IP) :'
 read HOSTDOMAIN
 if [[ $(dig +short $HOSTDOMAIN) != $IPHOST ]]
-then 
+then
   echo "Network tests show that this domain is not linked to this"
   echo "server IP ($IPHOST)."
   echo "Did you create a DNS A record for $HOSTDOMAIN pointing to"
@@ -141,8 +148,7 @@ fi
 # Initial update and clean up
 
 echo ""
-cmd_prt "Setup package system and update"
-apt-get -y update > $conserity_log_file
+cmd_prt "System packages update"
 apt-get -y upgrade >> $conserity_log_file
 ok
 
