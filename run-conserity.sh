@@ -308,7 +308,7 @@ then
     cmd_prt "Setup remote server #${srvi}"
     IPDIST=$(docker-machine ip $nodename$srvi)
     remexec="docker-machine ssh $nodename$srvi"
-        cat <<EOF > /tmp/Dockerfile
+    cat <<EOF > /tmp/Dockerfile
 FROM nginx:alpine
 RUN apk add --no-cache --update openssl
 RUN openssl req -newkey rsa:4096 -nodes -subj "/C=NO/L=MOON/O=CONSERITY/CN=${IPDIST}" -keyout /etc/nginx/privkey.pem -x509 -days 1460 -out /etc/nginx/cert_srv.pem
@@ -392,7 +392,7 @@ chown -R $fileUSER /home/$fileUSER/protected_files/*
 chgrp -R $fileUSER /home/$fileUSER/protected_files/*
 
 cat <<EOF > /root/mountsp.sh
-$PWD/getpwd  $fileIPclients | /usr/sbin/cryptsetup luksOpen /root/encryptdisk01 volume1
+$PWD/getpwd $fileIPclients | /usr/sbin/cryptsetup luksOpen /root/encryptdisk01 volume1
 mount /dev/mapper/volume1 /home/$fileUSER/protected_files
 EOF
 
