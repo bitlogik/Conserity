@@ -69,6 +69,8 @@ fi
 
 IPHOST=$(ip route get 1 | sed -n 's/^.*src \([0-9.]*\) .*$/\1/p')
 
+export DEBIAN_FRONTEND=noninteractive
+
 cmd_prt "Quick install for DNS check"
 echo ""
 apt-get -y update > $conserity_log_file
@@ -156,7 +158,7 @@ ok
 
 cmd_prt "Install packages needed"
 echo ""
-apt-get -y -qq install certbot nginx-light ufw cryptsetup unzip >> $conserity_log_file
+apt-get -y -qq install certbot nginx-light ufw cryptsetup unzip wget >> $conserity_log_file
 ok
 
 # install docker-machine
