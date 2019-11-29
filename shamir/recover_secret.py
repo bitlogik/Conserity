@@ -19,7 +19,7 @@ import shamir
 import base64
 
 if __name__ == "__main__":
-	assert len(sys.argv) > 3, "Requires 2 shares at least"
+	assert len(sys.argv) >= 2, "Requires 2 shares at least"
 	seedr = shamir.read_shares(map(base64.b64decode,sys.argv[1:]))
 	print(base64.b64encode(seedr).decode("ascii"))
 
