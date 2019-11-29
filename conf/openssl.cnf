@@ -1,0 +1,25 @@
+# Conserity remote nodes certificate file
+
+[ req ]
+default_bits = 4096
+prompt = no
+encrypt_key = no
+default_md = sha256
+distinguished_name = dn
+req_extensions = v3_req
+
+[ dn ]
+CN = $ENV::IPSRV
+O = CONSERITY
+L = MOON
+C = NO
+
+[ v3_req ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+basicConstraints = CA:FALSE
+subjectAltName = @alt_names
+
+[ alt_names ]
+IP.1 = $ENV::IPSRV

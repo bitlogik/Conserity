@@ -169,12 +169,13 @@ then
     then
     dmurl=https://github.com/docker/machine/releases/download/$DockerMachinev
     # ToDo : test against a hardcoded hash
-    curl -L $dmurl/docker-machine-$(uname -s)-$(uname -m) > /tmp/docker-machine &&
+    wget -q -O /tmp/docker-machine $dmurl/docker-machine-$(uname -s)-$(uname -m) &&
     mv /tmp/docker-machine /usr/local/bin/docker-machine &&
     chmod +x /usr/local/bin/docker-machine
   fi
   ok
 fi
+
 # Configure host for security
 
 cmd_prt "Setup host for the security"
@@ -313,15 +314,17 @@ then
     cat <<EOF > /tmp/Dockerfile
 FROM nginx:alpine
 RUN apk add --no-cache --update openssl
-RUN openssl req -newkey rsa:4096 -nodes -subj "/C=NO/L=MOON/O=CONSERITY/CN=${IPDIST}" -keyout /etc/nginx/privkey.pem -x509 -days 1460 -out /etc/nginx/cert_srv.pem
-RUN echo ${sec[$srvi]} > /usr/share/nginx/html/index.html
 COPY nginx_docker.conf /etc/nginx/nginx.conf
 COPY dhparam.pem /etc/nginx/dhparam.pem
+COPY openssl.cnf openssl.cnf
+RUN IPSRV=${IPDIST} openssl req -newkey rsa:4096 -config openssl.cnf -extensions v3_req -keyout /etc/nginx/privkey.pem -x509 -days 1460 -out /etc/nginx/cert_srv.pem
+RUN echo ${sec[$srvi]} > /usr/share/nginx/html/index.html
 RUN sed -i "s/IPHOST/${IPHOST}/g" /etc/nginx/nginx.conf
 EOF
-    sleep 5
+    sleep 4
     docker-machine scp /tmp/Dockerfile $nodename$srvi:~ >> $conserity_log_file
     docker-machine scp conf/nginx_docker.conf $nodename$srvi:~ >> $conserity_log_file
+    docker-machine scp conf/openssl.cnf $nodename$srvi:~ >> $conserity_log_file
     docker-machine scp conf/dhparam.pem $nodename$srvi:~ >> $conserity_log_file
     $remexec sudo systemctl enable docker &>> $conserity_log_file
     $remexec sudo systemctl stop update-engine >> $conserity_log_file
