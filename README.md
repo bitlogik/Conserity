@@ -176,9 +176,6 @@ It does NOT protect against :
 * A user of the web app is hacked/infected, so the data (s)he's reading is leaked.
 * Data deletion. Conserity is not a backup system. Nevertheless, it helps to backup, since any data in the protected folder is securely encrypted.
 
-Why is my email address needed ?  
-Your email address is asked by certbot for the LetsEncrypt certificate ACME server. This is required to register an account, and useful in the event of server key loss or account compromise, also to receive notices about revocation of your certificates.
-
 Why I get a security alert when I connect again on SSH ? Is it an intermediate system in the link spying or analyzing the data link?  
 Absolutely not, you still connect directly to your server SSHd and without anything in the middle. Conserity just generates new SSH keys to be sure the used ones are robust. So the SSH keys are changed and thus eventually triggering an alert about the server has changed its host key.
 
