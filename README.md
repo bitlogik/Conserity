@@ -113,7 +113,6 @@ Run Conserity in the main server :
 
 ```
 ./run-conserity.sh
-
 ```
 
 Follow the instructions. You can choose :
@@ -141,7 +140,7 @@ Conserity performs the following :
 
 At the end it is advised to reboot, at least to update the kernel version.
 
-If you choose the option to use "one existing remote web server", setup this remote server files as displayed at the end before rebooting.
+If you choose the option to use "one existing remote web server", setup that remote server files as displayed at the end before rebooting.
 
 #### Info
 
@@ -202,5 +201,5 @@ email : project@conserity.org
 * Test dl softwares against hardcoded hash and/or signatures
 * Add more HTTP headers
 * Add others web service types : PHP/HTML and WSGI
-* Ubuntu compatibility (also Debian 9, and then Fedora/CentOS/RHEL)
+* Ubuntu compatibility (and then Fedora/CentOS/RHEL)
 * Add others VPS providers : Vultr, Scaleway, then DigitalOcean and AWS
