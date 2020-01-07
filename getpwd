@@ -17,8 +17,10 @@ clientIPs=`cat $1`
 shares=""
 for i in $clientIPs
 do
-# Sanitize data read from wget
-  shares="$shares $(wget -T 8 -O - https://$i 2>/dev/null)" || :
+  share="$(wget -T 4 -t 2 -O - https://$i 2>/dev/null)" || :
+  if [[ $share =~ ^[a-zA-Z0-9+/]{44}$ ]]; then
+    shares="$shares $share"
+  fi
 done
 echo $(eval "$(dirname $0)/shamir/recover_secret.py $shares")
 
