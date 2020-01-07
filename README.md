@@ -193,7 +193,6 @@ email : project@conserity.org
 
 ## ToDo
 
-* Add OSCP stapling
 * Test dl softwares against hardcoded hash and/or signatures
 * Add more HTTP headers
 * Add others web service types : PHP/HTML and WSGI

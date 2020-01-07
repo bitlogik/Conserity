@@ -241,15 +241,15 @@ fi
 
 echo ""
 echo ""
-echo " CERTBOT LetsEncrypt info and licence :"
-certbot certonly --standalone --rsa-key-size 4096 --no-eff-email -d $HOSTDOMAIN
+certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --must-staple -d $HOSTDOMAIN
 
 [ -f "/etc/nginx/nginx.conf.OLD" ] || mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.OLD
 cp -f conf/nginx.conf /etc/nginx/
 sed -i "s/DOMAIN/${HOSTDOMAIN}/g" /etc/nginx/nginx.conf
 cp -f conf/dhparam.pem /etc/nginx/
 service nginx start >> $conserity_log_file
-
+sleep 2
+echo QUIT | openssl s_client -connect $HOSTDOMAIN:443 -tls1_2 -status > /dev/null
 ok
 
 # Disable swap, so all in RAM
