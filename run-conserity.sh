@@ -179,7 +179,7 @@ then
     then
     dmurl=https://github.com/docker/machine/releases/download/$DockerMachinev
     wget -q -O /tmp/docker-machine $dmurl/docker-machine-$(uname -s)-$(uname -m)
-    test_file docker-machine-$(uname -s)-$(uname -m) a7f7cbb842752b12123c5a5447d8039bf8dccf62ec2328853583e68eb4ffb097
+    test_file /tmp/docker-machine a7f7cbb842752b12123c5a5447d8039bf8dccf62ec2328853583e68eb4ffb097
     mv /tmp/docker-machine /usr/local/bin/docker-machine
     chmod +x /usr/local/bin/docker-machine
   fi
