@@ -25,7 +25,7 @@ then
   # Linode driver
   echo -e "\nInstalling Linode driver"
   wget https://github.com/linode/docker-machine-driver-linode/releases/download/$DMLinodev/docker-machine-driver-linode_linux-amd64.zip &> /dev/null
-  # ToDo : test against a hardcoded hash and/or a signature
+  test_file docker-machine-driver-linode_linux-amd64.zip b31b6a504c59ee758d2dda83029fe4a85b3f5601e22dfa58700a5e6c8f450dc7
   unzip -qq docker-machine-driver-linode_linux-amd64 -x *.md LICENSE
   mv docker-machine-driver-linode /usr/local/bin/docker-machine-driver-linode && chmod +x /usr/local/bin/docker-machine-driver-linode
 fi

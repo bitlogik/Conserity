@@ -196,7 +196,6 @@ email : project@conserity.org
 
 ## ToDo
 
-* Test dl softwares against hardcoded hash and/or signatures
 * Add more HTTP headers
 * Add others web service types : PHP/HTML and WSGI
 * Ubuntu compatibility (and then Fedora/CentOS/RHEL)

@@ -317,6 +317,7 @@ then
   for srvi in $(seq $Nshares)
   do
     cmd_prt "Creating the remote server #${srvi} at Linode"
+    export -f test_file
     ./vps-drivers/create-linode.sh $nodename$srvi
     ok
     cmd_prt "Setup remote server #${srvi}"
