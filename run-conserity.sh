@@ -413,7 +413,7 @@ ok
 if [ "$RemOpt" == '2' ] # and HTTPS access
 then 
   cmd_prt "Clean up"
-  #rm -Rf ~/.docker/machine/machines/$nodename*
+  rm -Rf ~/.docker/machine/machines/$nodename*
   ok
 fi
 
