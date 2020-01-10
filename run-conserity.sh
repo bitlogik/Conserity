@@ -22,7 +22,7 @@
 # #### Conserity Parameters ####
 
 conserity_log_file="log/output.log"
-DockerMachinev=v0.16.0
+DockerMachinev=v0.16.2
 
 # #### CONSERITY SCRIPT 
 
