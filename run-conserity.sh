@@ -43,6 +43,16 @@ sep() {
   echo ""
 }
 
+test_file () {
+  # test_file FileName SHA256sum
+  printf "\nTesting $1 ..."
+  if ! ( echo "$2 $1" | sha256sum --status -c - ) then
+    echo -e "\nERROR : File $1 is not present or corrupted"
+    exit 1
+  fi
+  printf "  file OK\n\n"
+}
+
 # ToDo : COLS=$(tput cols), tput cup $COL $ROW
 
 sep
@@ -168,9 +178,9 @@ then
   if ! (type docker-machine &> /dev/null)
     then
     dmurl=https://github.com/docker/machine/releases/download/$DockerMachinev
-    # ToDo : test against a hardcoded hash
-    wget -q -O /tmp/docker-machine $dmurl/docker-machine-$(uname -s)-$(uname -m) &&
-    mv /tmp/docker-machine /usr/local/bin/docker-machine &&
+    wget -q -O /tmp/docker-machine $dmurl/docker-machine-$(uname -s)-$(uname -m)
+    test_file docker-machine-$(uname -s)-$(uname -m) a7f7cbb842752b12123c5a5447d8039bf8dccf62ec2328853583e68eb4ffb097
+    mv /tmp/docker-machine /usr/local/bin/docker-machine
     chmod +x /usr/local/bin/docker-machine
   fi
   ok
