@@ -415,12 +415,12 @@ chown -R $fileUSER /home/$fileUSER/protected_files/*
 chgrp -R $fileUSER /home/$fileUSER/protected_files/*
 
 cat <<EOF > /root/mountsp.sh
-$PWD/getpwd $fileIPclients | /usr/sbin/cryptsetup luksOpen /root/encryptdisk01 volume1
+$PWD/getpwd $fileIPclients | cryptsetup luksOpen /root/encryptdisk01 volume1
 mount /dev/mapper/volume1 /home/$fileUSER/protected_files
 EOF
 
-echo '@reboot  sleep 30 ; bash /root/mountsp.sh' >> /var/spool/cron/crontabs/root
-echo "@reboot  sleep 60 ; /usr/sbin/service nginx reload && openssl s_client -connect $HOSTDOMAIN:443 -status < /dev/null" >> /var/spool/cron/crontabs/root
+echo '@reboot  sleep 60 ; bash /root/mountsp.sh' >> /var/spool/cron/crontabs/root
+echo "@reboot  sleep 90 ; /usr/sbin/service nginx reload && openssl s_client -connect $HOSTDOMAIN:443 -status < /dev/null" >> /var/spool/cron/crontabs/root
 echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
 crontab /var/spool/cron/crontabs/root
 
