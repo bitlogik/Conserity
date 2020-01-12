@@ -49,7 +49,7 @@ Can be used to protect the following apps :
 
 #### Prerequisite
 
-A Debian 10 system  
+A Debian 10 or Ubuntu 18.04+ system  
 with its IP on a domain
 
 You must create an A record for your domain that points to the IP address of the server instance. If your server is behind a NAT, then you need to forward port # 80 to your instance.
@@ -60,8 +60,7 @@ If you choose the Shamir secret split of the encryption key in several remote se
 
 OS : Linux based
 * Debian, Ubuntu
-* Fedora , CentOS , RHEL  
-Only Debian 10 for now.
+* Fedora , CentOS , RHEL  (later)
 
 VPS instance providers :
 * DigitalOcean

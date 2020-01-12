@@ -22,5 +22,5 @@ do
     shares="$shares $share"
   fi
 done
-echo $(eval "$(dirname $0)/shamir/recover_secret.py $shares")
+eval "$(dirname $0)/shamir/recover_secret.py $shares"
 

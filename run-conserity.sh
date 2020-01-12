@@ -62,11 +62,20 @@ sep
 cmd_prt "Detecting host Linux system"
 
 # To Do : system detection and adapt script
-if ! (cat /etc/os-release | grep "10 (buster)" > /dev/null ) then
-  echo "For now, Conserity only runs on Debian 10."
+if ! (cat /etc/os-release | grep -E "10 (buster)|18\.04\..+ LTS \(Bionic Beaver\)|19\.04 \(Disco Dingo\)|19\.10 \(Eoan Ermine\)" > /dev/null ) then
+  echo "For now, Conserity only runs on Debian 10, Ubuntu 18.04, 19.04 or 19.10."
   exit 1
 fi
 ok
+
+if (cat /etc/os-release | grep -E "18\.04\..+ LTS \(Bionic Beaver\)" > /dev/null) then
+  echo "On Ubuntu 18.04, LUKS is an older version."
+  echo "The security of the disk encryption is lower than LUKS2"
+  read -p ' Continue anyway ? [y/N] : ' U18choice
+  if [[ $U18choice != "y" ]]; then
+    exit 1
+  fi
+fi
 
 # Is root ?
 if [[ $EUID -ne 0 ]]; then
@@ -326,7 +335,7 @@ RUN apk add --no-cache --update openssl
 COPY nginx_docker.conf /etc/nginx/nginx.conf
 COPY dhparam.pem /etc/nginx/dhparam.pem
 COPY openssl.cnf openssl.cnf
-RUN IPSRV=${IPDIST} openssl req -newkey rsa:4096 -config openssl.cnf -extensions v3_req -keyout /etc/nginx/privkey.pem -x509 -days 1460 -out /etc/nginx/cert_srv.pem
+RUN IPSRV=${IPDIST} openssl req -config openssl.cnf -new -x509 -sha256 -newkey rsa:4096 -nodes -keyout /etc/nginx/privkey.pem -x509 -days 1825 -out /etc/nginx/cert_srv.pem
 RUN echo ${sec[$srvi]} > /usr/share/nginx/html/index.html
 RUN sed -i "s/IPHOST/${IPHOST}/g" /etc/nginx/nginx.conf
 EOF
@@ -406,12 +415,12 @@ chown -R $fileUSER /home/$fileUSER/protected_files/*
 chgrp -R $fileUSER /home/$fileUSER/protected_files/*
 
 cat <<EOF > /root/mountsp.sh
-$PWD/getpwd $fileIPclients | /usr/sbin/cryptsetup luksOpen /root/encryptdisk01 volume1
+$PWD/getpwd $fileIPclients | cryptsetup luksOpen /root/encryptdisk01 volume1
 mount /dev/mapper/volume1 /home/$fileUSER/protected_files
 EOF
 
-echo '@reboot  sleep 30 ; bash /root/mountsp.sh' >> /var/spool/cron/crontabs/root
-echo "@reboot  sleep 60 ; /usr/sbin/service nginx reload && openssl s_client -connect $HOSTDOMAIN:443 -status < /dev/null" >> /var/spool/cron/crontabs/root
+echo '@reboot  sleep 60 ; bash /root/mountsp.sh' >> /var/spool/cron/crontabs/root
+echo "@reboot  sleep 90 ; /usr/sbin/service nginx reload && openssl s_client -connect $HOSTDOMAIN:443 -status < /dev/null" >> /var/spool/cron/crontabs/root
 echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
 crontab /var/spool/cron/crontabs/root
 
@@ -467,9 +476,13 @@ echo "A ${PDISKSZ} MB encrypted partition is mounted on"
 echo "/home/${fileUSER}/protected_files/"
 echo ""
 echo "It will be automatically mounted at every boot,"
-echo "reading the secret from the remote server(s)."
+echo "reading the secret from the remote server(s).\n"
 
-echo -e "\nYou can reboot the machine to finish the installation"
+if [ "$RemOpt" == '1' ]
+then
+  echo "Once you put the files in the ${WEBDOMAIN} remote web server,"
+fi
+echo -e "you can reboot the machine to finish the installation."
 
 sep
 echo ""
