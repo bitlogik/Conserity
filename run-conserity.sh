@@ -16,15 +16,12 @@
 # Conserity script
 # For Debian 10
 
-# To Do
-# * Secure the tools installation hash of the dl code and scripts
-
 # #### Conserity Parameters ####
 
 conserity_log_file="log/output.log"
 DockerMachinev=v0.16.2
 
-# #### CONSERITY SCRIPT 
+# #### CONSERITY SCRIPT
 
 # Display functions
 
@@ -93,7 +90,7 @@ ok
 
 echo ""
 echo 'Input the host web domain of this server (DNS A to the server IP) :'
-read HOSTDOMAIN
+read -p '> ' HOSTDOMAIN
 if [[ $(dig +short $HOSTDOMAIN) != $IPHOST ]]
 then
   echo "Network tests show that this domain is not linked to this"
