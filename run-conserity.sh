@@ -467,9 +467,13 @@ echo "A ${PDISKSZ} MB encrypted partition is mounted on"
 echo "/home/${fileUSER}/protected_files/"
 echo ""
 echo "It will be automatically mounted at every boot,"
-echo "reading the secret from the remote server(s)."
+echo "reading the secret from the remote server(s).\n"
 
-echo -e "\nYou can reboot the machine to finish the installation"
+if [ "$RemOpt" == '1' ]
+then
+  echo "Once you put the files in the ${WEBDOMAIN} remote web server,"
+fi
+echo -e "you can reboot the machine to finish the installation."
 
 sep
 echo ""
