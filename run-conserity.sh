@@ -326,7 +326,7 @@ RUN apk add --no-cache --update openssl
 COPY nginx_docker.conf /etc/nginx/nginx.conf
 COPY dhparam.pem /etc/nginx/dhparam.pem
 COPY openssl.cnf openssl.cnf
-RUN IPSRV=${IPDIST} openssl req -newkey rsa:4096 -config openssl.cnf -extensions v3_req -keyout /etc/nginx/privkey.pem -x509 -days 1460 -out /etc/nginx/cert_srv.pem
+RUN IPSRV=${IPDIST} openssl req -config openssl.cnf -new -x509 -sha256 -newkey rsa:4096 -nodes -keyout /etc/nginx/privkey.pem -x509 -days 1825 -out /etc/nginx/cert_srv.pem
 RUN echo ${sec[$srvi]} > /usr/share/nginx/html/index.html
 RUN sed -i "s/IPHOST/${IPHOST}/g" /etc/nginx/nginx.conf
 EOF
