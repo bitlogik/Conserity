@@ -62,11 +62,20 @@ sep
 cmd_prt "Detecting host Linux system"
 
 # To Do : system detection and adapt script
-if ! (cat /etc/os-release | grep "10 (buster)" > /dev/null ) then
+if ! (cat /etc/os-release | grep -E "10 (buster)|18\.04\..+ LTS \(Bionic Beaver\)|19\.04 \(Disco Dingo\)|19\.10 (Eoan Ermine)" > /dev/null ) then
   echo "For now, Conserity only runs on Debian 10."
   exit 1
 fi
 ok
+
+if (cat /etc/os-release | grep -E "18\.04\..+ LTS \(Bionic Beaver\)" > /dev/null) then
+  echo "On Ubuntu 18.04, LUKS is an older version."
+  echo "The security of the disk encryption is lower than LUKS2"
+  read -p ' Continue anyway ? [y/N] : ' U18choice
+  if [[ $U18choice -ne "y" ]]; then
+    exit 1
+  fi
+fi
 
 # Is root ?
 if [[ $EUID -ne 0 ]]; then
