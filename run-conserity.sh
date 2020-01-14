@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Conserity : Strengthen you server and protect your data
-# Copyright (C) 2019  BitLogiK
+# Copyright (C) 2019-2020  BitLogiK
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 # Conserity script
-# For Debian 10
+# For Debian and Ubuntu
 
 # #### Conserity Parameters ####
 
@@ -62,7 +62,7 @@ sep
 cmd_prt "Detecting host Linux system"
 
 # To Do : system detection and adapt script
-if ! (cat /etc/os-release | grep -E "10 (buster)|18\.04\..+ LTS \(Bionic Beaver\)|19\.04 \(Disco Dingo\)|19\.10 \(Eoan Ermine\)" > /dev/null ) then
+if ! (cat /etc/os-release | grep -E "10 \(buster\)|18\.04\..+ LTS \(Bionic Beaver\)|19\.04 \(Disco Dingo\)|19\.10 \(Eoan Ermine\)" > /dev/null ) then
   echo "For now, Conserity only runs on Debian 10, Ubuntu 18.04, 19.04 or 19.10."
   exit 1
 fi
@@ -87,12 +87,6 @@ IPHOST=$(ip route get 1 | sed -n 's/^.*src \([0-9.]*\) .*$/\1/p')
 
 export DEBIAN_FRONTEND=noninteractive
 
-cmd_prt "Quick install for DNS check"
-echo ""
-apt-get -y update > $conserity_log_file
-apt-get -y install dnsutils >> $conserity_log_file
-ok
-
 # Users and Server Parameters
 
 # ToDo check inputs
@@ -100,7 +94,8 @@ ok
 echo ""
 echo 'Input the host web domain of this server (DNS A to the server IP) :'
 read -p '> ' HOSTDOMAIN
-if [[ $(dig +short $HOSTDOMAIN) != $IPHOST ]]
+if [[ $(host $HOSTDOMAIN | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}') != $IPHOST ]]
+ 
 then
   echo "Network tests show that this domain is not linked to this"
   echo "server IP ($IPHOST)."
@@ -145,28 +140,16 @@ WebServiceType=web
 # Linode, ( DigitalOcean, Vultr, AWS, Scaleway )
 if [ "$RemOpt" == '2' ]
 then
-  RemoteProvider01=linode
-
-  if [ ! $LinodeAPIKey ]; then
-    echo "LinodeAPIKey env var with your Linode APIv4 personal"
-    echo "access token is required."
-    echo "For example, use before starting run-conserity :"
-    echo 'export LinodeAPIKey=YOURLINODEAPITOKEN ; history -d $(history 1)'
-  exit 1
-  fi
-
   echo ""
   read -p 'Total number of servers / shares (rec 4) : ' Nshares
   read -p 'Minimum shares requires (rec 3) : ' Krequired
-
-  echo ""
-  echo "Using $RemoteProvider01 VPS provider"
 fi
 
 # Initial update and clean up
 
 echo ""
 cmd_prt "System packages update"
+apt-get -y update > $conserity_log_file
 apt-get -y upgrade >> $conserity_log_file
 ok
 
@@ -197,46 +180,10 @@ fi
 cmd_prt "Setup host for the security"
 
 [ -f "/etc/sysctl.conf.OLD" ] || mv /etc/sysctl.conf /etc/sysctl.conf.OLD
-cat <<EOF > /etc/sysctl.conf
-net.ipv4.conf.default.rp_filter=1
-net.ipv4.conf.all.rp_filter=1
-net.ipv4.conf.all.accept_redirects = 0
-net.ipv6.conf.all.accept_redirects = 0
-net.ipv4.conf.all.send_redirects = 0
-net.ipv4.conf.all.accept_source_route = 0
-net.ipv6.conf.all.accept_source_route = 0
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
-net.ipv6.conf.eth0.disable_ipv6 = 1
-EOF
+cp conf/sysctl.conf /etc/sysctl.conf
 
 [ -f "/etc/ssh/sshd_config.OLD" ] || mv /etc/ssh/sshd_config /etc/ssh/sshd_config.OLD
-cat <<EOF > /etc/ssh/sshd_config
-Protocol 2
-HostKey /etc/ssh/ssh_host_ed25519_key
-HostKey /etc/ssh/ssh_host_rsa_key
-Port $SSHPORT
-AcceptEnv LANG LC_*
-Subsystem       sftp    /usr/lib/openssh/sftp-server
-AddressFamily inet
-X11Forwarding no
-AllowAgentForwarding no
-MaxAuthTries 4
-KexAlgorithms curve25519-sha256@libssh.org
-HostKeyAlgorithms ssh-ed25519,ssh-rsa
-Ciphers aes256-gcm@openssh.com,aes256-ctr,chacha20-poly1305@openssh.com
-MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com
-AllowUsers root $fileUSER
-PermitRootLogin prohibit-password
-AllowTcpForwarding no
-AllowStreamLocalForwarding no
-GatewayPorts no
-PermitTunnel no
-ChallengeResponseAuthentication no
-UsePAM no
-PrintMotd no
-EOF
+SSHPORT=$SSHPORT fileUSER=$fileUSER envsubst < conf/sshd_config > /etc/ssh/sshd_config
 
 rm -f /etc/ssh/ssh_host_*key*
 ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N "" < /dev/null >> $conserity_log_file
@@ -258,7 +205,7 @@ fi
 echo ""
 echo ""
 echo " CERTBOT LetsEncrypt info and licence :"
-certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --must-staple -d $HOSTDOMAIN
+certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --must-staple --test-cert -d $HOSTDOMAIN
 
 [ -f "/etc/nginx/nginx.conf.OLD" ] || mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.OLD
 cp -f conf/nginx.conf /etc/nginx/
@@ -283,7 +230,6 @@ ufw default allow outgoing >> $conserity_log_file
 ufw allow $SSHPORT/tcp >> $conserity_log_file
 ufw limit $SSHPORT/tcp >> $conserity_log_file
 ufw allow 443/tcp >> $conserity_log_file
-ufw deny 80 >> $conserity_log_file
 ufw deny 68 >> $conserity_log_file
 ufw deny 5100 >> $conserity_log_file
 ufw allow 53 >> $conserity_log_file
@@ -322,30 +268,46 @@ then
 
   for srvi in $(seq $Nshares)
   do
-    cmd_prt "Creating the remote server #${srvi} at Linode"
+    echo -e "\nAt which VPS cloud provider setting the #${srvi} Shamir share remote server?"
+    echo " 1) Digital Ocean"
+    echo " 2) Linode"
+    echo " 3) Scaleway"
+    read -p ' Choice : ' ProvChoice
+    case $ProvChoice in
+    "1")
+        ProvName="Digital Ocean"
+        ProvScript=do
+        ;;
+    "2")
+        ProvName="Linode"
+        ProvScript=linode
+        ;;
+    "3")
+        ProvName="Scaleway"
+        ProvScript=sw
+        ;;
+    esac
+    read -p " Input your ${ProvName} API key : " APIKey
+    cmd_prt "Creating the remote server #${srvi} at ${ProvName}"
     export -f test_file
-    ./vps-drivers/create-linode.sh $nodename$srvi
+    ./vps-drivers/create-${ProvScript}.sh $nodename$srvi $APIKey
     ok
     cmd_prt "Setup remote server #${srvi}"
     IPDIST=$(docker-machine ip $nodename$srvi)
     remexec="docker-machine ssh $nodename$srvi"
-    cat <<EOF > /tmp/Dockerfile
-FROM nginx:alpine
-RUN apk add --no-cache --update openssl
-COPY nginx_docker.conf /etc/nginx/nginx.conf
-COPY dhparam.pem /etc/nginx/dhparam.pem
-COPY openssl.cnf openssl.cnf
-RUN IPSRV=${IPDIST} openssl req -config openssl.cnf -new -x509 -sha256 -newkey rsa:4096 -nodes -keyout /etc/nginx/privkey.pem -x509 -days 1825 -out /etc/nginx/cert_srv.pem
-RUN echo ${sec[$srvi]} > /usr/share/nginx/html/index.html
-RUN sed -i "s/IPHOST/${IPHOST}/g" /etc/nginx/nginx.conf
-EOF
+    if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
+      cp conf/DockerFileUb /tmp/DockerfileVars
+    else
+      cp conf/DockerFile /tmp/DockerfileVars
+    fi
+    seci=${sec[$srvi]} IPDIST=$IPDIST IPHOST=$IPHOST envsubst < /tmp/DockerfileVars > /tmp/Dockerfile
     sleep 4
     docker-machine scp /tmp/Dockerfile $nodename$srvi:~ >> $conserity_log_file
     docker-machine scp conf/nginx_docker.conf $nodename$srvi:~ >> $conserity_log_file
     docker-machine scp conf/openssl.cnf $nodename$srvi:~ >> $conserity_log_file
     docker-machine scp conf/dhparam.pem $nodename$srvi:~ >> $conserity_log_file
     $remexec sudo systemctl enable docker &>> $conserity_log_file
-    $remexec sudo systemctl stop update-engine >> $conserity_log_file
+    $remexec sudo systemctl stop update-engine || :
     $remexec docker build -t mynginximage1 . >> $conserity_log_file
     $remexec docker run --restart always -p 443:443 --name mynginx -d mynginximage1 >> $conserity_log_file
     $remexec docker cp mynginx:/etc/nginx/cert_srv.pem cert_srv.pem
@@ -353,17 +315,17 @@ EOF
     ok
   done
   rm -f /tmp/Dockerfile
+  rm -f /tmp/DockerfileVars
+  APIKey=" "
 
   # install the self-signed certificates of the remote servers
   update-ca-certificates --fresh >> $conserity_log_file
+  sleep 2
 
   # IP list of the client nodes
   # into a list used by getpwd
 
   fileIPclients=/root/ip_client
-  echo ""
-  cmd_prt "Creating the encrypted partition"
-
   docker-machine ip $(seq -f $nodename%1.f -s \  $Nshares) > $fileIPclients
 
   # test secret reading in the client servers
@@ -371,6 +333,9 @@ EOF
     echo "ERROR : issue with remote servers"
     exit 1
   fi
+
+  echo ""
+  cmd_prt "Creating the encrypted partition"
 
   echo "This can takes some time (5'000MB ~ 1min)"
   fallocate -l ${PDISKSZ}M /root/encryptdisk01
@@ -415,24 +380,23 @@ chown -R $fileUSER /home/$fileUSER/protected_files/*
 chgrp -R $fileUSER /home/$fileUSER/protected_files/*
 
 cat <<EOF > /root/mountsp.sh
-$PWD/getpwd $fileIPclients | cryptsetup luksOpen /root/encryptdisk01 volume1
+$PWD/getpwd $fileIPclients | $(type -P cryptsetup) luksOpen /root/encryptdisk01 volume1
 mount /dev/mapper/volume1 /home/$fileUSER/protected_files
 EOF
 
-echo '@reboot  sleep 60 ; bash /root/mountsp.sh' >> /var/spool/cron/crontabs/root
-echo "@reboot  sleep 90 ; /usr/sbin/service nginx reload && openssl s_client -connect $HOSTDOMAIN:443 -status < /dev/null" >> /var/spool/cron/crontabs/root
-echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
+echo "@reboot  sleep 60 ; bash /root/mountsp.sh ; sleep 15 ; /usr/sbin/service nginx reload && openssl s_client -connect $HOSTDOMAIN:443 -status" > /var/spool/cron/crontabs/root
+echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" --test-cert -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
 crontab /var/spool/cron/crontabs/root
 
 ok
 
 # Delete remote servers access
-if [ "$RemOpt" == '2' ] # and HTTPS access
-then 
-  cmd_prt "Clean up"
-  rm -Rf ~/.docker/machine/machines/$nodename*
-  ok
-fi
+# if [ "$RemOpt" == '2' ] # and HTTPS access
+# then 
+  # cmd_prt "Clean up"
+  # rm -Rf ~/.docker/machine/machines/$nodename*
+  # ok
+# fi
 
 sep
 echo -e "Conserity configured everything successfully ! "
@@ -476,7 +440,7 @@ echo "A ${PDISKSZ} MB encrypted partition is mounted on"
 echo "/home/${fileUSER}/protected_files/"
 echo ""
 echo "It will be automatically mounted at every boot,"
-echo "reading the secret from the remote server(s).\n"
+echo -e "reading the secret from the remote server(s).\n"
 
 if [ "$RemOpt" == '1' ]
 then

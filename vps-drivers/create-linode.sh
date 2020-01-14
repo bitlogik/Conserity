@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Conserity : Manage Linode VPS to install a machine
-# Copyright (C) 2019  BitLogiK
+# Copyright (C) 2019-2020  BitLogiK
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,11 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
-# Requires LinodeAPIKey env variable
-
 # Install the docker-machine driver for Linode
 # Only if wasn't done before
-
 DMLinodev=v0.1.8
 
 if ! ( type docker-machine-driver-linode &> /dev/null )
@@ -30,4 +27,4 @@ then
   mv docker-machine-driver-linode /usr/local/bin/docker-machine-driver-linode && chmod +x /usr/local/bin/docker-machine-driver-linode
 fi
 
-docker-machine create -d linode --linode-token=$LinodeAPIKey --linode-region eu-central --linode-image=linode/containerlinux --linode-instance-type g6-nanode-1 $1
+docker-machine create -d linode --linode-token=$2 --linode-region eu-central --linode-image=linode/containerlinux --linode-instance-type g6-nanode-1 $1
