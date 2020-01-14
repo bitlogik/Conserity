@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 # Conserity script
-# For Debian 10
+# For Debian and Ubuntu
 
 # #### Conserity Parameters ####
 
@@ -329,16 +329,11 @@ then
     cmd_prt "Setup remote server #${srvi}"
     IPDIST=$(docker-machine ip $nodename$srvi)
     remexec="docker-machine ssh $nodename$srvi"
-    cat <<EOF > /tmp/Dockerfile
-FROM nginx:alpine
-RUN apk add --no-cache --update openssl
-COPY nginx_docker.conf /etc/nginx/nginx.conf
-COPY dhparam.pem /etc/nginx/dhparam.pem
-COPY openssl.cnf openssl.cnf
-RUN IPSRV=${IPDIST} openssl req -config openssl.cnf -new -x509 -sha256 -newkey rsa:4096 -nodes -keyout /etc/nginx/privkey.pem -x509 -days 1825 -out /etc/nginx/cert_srv.pem
-RUN echo ${sec[$srvi]} > /usr/share/nginx/html/index.html
-RUN sed -i "s/IPHOST/${IPHOST}/g" /etc/nginx/nginx.conf
-EOF
+    if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
+      cp conf/DockerfileUb /tmp/Dockerfile
+    else
+      cp conf/Dockerfile /tmp/Dockerfile
+    fi
     sleep 4
     docker-machine scp /tmp/Dockerfile $nodename$srvi:~ >> $conserity_log_file
     docker-machine scp conf/nginx_docker.conf $nodename$srvi:~ >> $conserity_log_file
