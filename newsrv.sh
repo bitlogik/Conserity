@@ -94,7 +94,7 @@ if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
 else
   cp conf/DockerFile /tmp/DockerfileVars
 fi
-sec=$sec srvi=$srvi IPDIST=$IPDIST IPHOST=$IPHOST envsubst < /tmp/DockerfileVars > /tmp/Dockerfile
+seci=${sec[$srvi]} IPDIST=$IPDIST IPHOST=$IPHOST envsubst < /tmp/DockerfileVars > /tmp/Dockerfile
 sleep 4
 docker-machine scp /tmp/Dockerfile $nodename$srvi:~
 docker-machine scp conf/nginx_docker.conf $nodename$srvi:~

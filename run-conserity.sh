@@ -344,8 +344,7 @@ then
     else
       cp conf/DockerFile /tmp/Dockerfile
     fi
-    export sec srvi IPDIST IPHOST
-    envsubst < /tmp/Dockerfile
+    seci=${sec[$srvi]} IPDIST=$IPDIST IPHOST=$IPHOST envsubst < /tmp/DockerfileVars > /tmp/Dockerfile
     sleep 4
     docker-machine scp /tmp/Dockerfile $nodename$srvi:~ >> $conserity_log_file
     docker-machine scp conf/nginx_docker.conf $nodename$srvi:~ >> $conserity_log_file
