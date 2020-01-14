@@ -272,6 +272,7 @@ then
     echo " 1) Digital Ocean"
     echo " 2) Linode"
     echo " 3) Scaleway"
+    echo " 4) Vultr (experimental)"
     read -p ' Choice : ' ProvChoice
     case $ProvChoice in
     "1")
@@ -285,6 +286,10 @@ then
     "3")
         ProvName="Scaleway"
         ProvScript=sw
+        ;;
+    "4")
+        ProvName="Vultr"
+        ProvScript=vultr
         ;;
     esac
     read -p " Input your ${ProvName} API key : " APIKey

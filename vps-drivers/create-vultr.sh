@@ -27,6 +27,8 @@ then
 fi
 
 docker-machine create -d vultr --vultr-api-key=$2 --vultr-region-id=9 --vultr-os-id=179 --vultr-plan-id=201 $1 || :
-docker-machine restart $1 || :
+docker-machine stop $1 || :
+docker-machine start $1 || :
+docker-machine start $1 || :
 sleep 10
-docker-machine regenerate-certs $1
+docker-machine regenerate-certs -f $1
