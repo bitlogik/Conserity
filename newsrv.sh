@@ -53,7 +53,7 @@ fi
 
 IPHOST=$(ip route get 1 | sed -n 's/^.*src \([0-9.]*\) .*$/\1/p')
 
-sec="ABCD 01"
+sec="ABCD"
 
 CertsDIR=/usr/local/share/ca-certificates
 hostid=$(cat /etc/machine-id | sha256sum | cut -c1-8)
@@ -94,7 +94,7 @@ if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
 else
   cp conf/DockerFile /tmp/DockerfileVars
 fi
-seci=${sec[$srvi]} IPDIST=$IPDIST IPHOST=$IPHOST envsubst < /tmp/DockerfileVars > /tmp/Dockerfile
+seci=${sec} IPDIST=$IPDIST IPHOST=$IPHOST envsubst < /tmp/DockerfileVars > /tmp/Dockerfile
 sleep 4
 docker-machine scp /tmp/Dockerfile $nodename$srvi:~
 docker-machine scp conf/nginx_docker.conf $nodename$srvi:~
