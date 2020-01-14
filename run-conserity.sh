@@ -205,7 +205,7 @@ fi
 echo ""
 echo ""
 echo " CERTBOT LetsEncrypt info and licence :"
-certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --must-staple --test-cert -d $HOSTDOMAIN
+certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --must-staple -d $HOSTDOMAIN
 
 [ -f "/etc/nginx/nginx.conf.OLD" ] || mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.OLD
 cp -f conf/nginx.conf /etc/nginx/
@@ -385,7 +385,7 @@ mount /dev/mapper/volume1 /home/$fileUSER/protected_files
 EOF
 
 echo "@reboot  sleep 60 ; bash /root/mountsp.sh ; sleep 15 ; /usr/sbin/service nginx reload && openssl s_client -connect $HOSTDOMAIN:443 -status" > /var/spool/cron/crontabs/root
-echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" --test-cert -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
+echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
 crontab /var/spool/cron/crontabs/root
 
 ok
