@@ -230,6 +230,7 @@ ufw default allow outgoing >> $conserity_log_file
 ufw allow $SSHPORT/tcp >> $conserity_log_file
 ufw limit $SSHPORT/tcp >> $conserity_log_file
 ufw allow 443/tcp >> $conserity_log_file
+ufw allow 80/tcp >> $conserity_log_file
 ufw deny 68 >> $conserity_log_file
 ufw deny 5100 >> $conserity_log_file
 ufw allow 53 >> $conserity_log_file
