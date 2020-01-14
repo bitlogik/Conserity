@@ -481,7 +481,7 @@ echo "A ${PDISKSZ} MB encrypted partition is mounted on"
 echo "/home/${fileUSER}/protected_files/"
 echo ""
 echo "It will be automatically mounted at every boot,"
-echo "reading the secret from the remote server(s).\n"
+echo -e "reading the secret from the remote server(s).\n"
 
 if [ "$RemOpt" == '1' ]
 then
