@@ -64,7 +64,7 @@ OS : Linux based
 
 VPS instance providers :
 * DigitalOcean
-* Vultr
+* Vultr (experimental)
 * Linode
 * Scaleway
 * AWS (soon)
