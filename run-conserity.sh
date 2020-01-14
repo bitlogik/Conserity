@@ -145,16 +145,6 @@ WebServiceType=web
 # Linode, ( DigitalOcean, Vultr, AWS, Scaleway )
 if [ "$RemOpt" == '2' ]
 then
-  RemoteProvider01=linode
-
-  if [ ! $LinodeAPIKey ]; then
-    echo "LinodeAPIKey env var with your Linode APIv4 personal"
-    echo "access token is required."
-    echo "For example, use before starting run-conserity :"
-    echo 'export LinodeAPIKey=YOURLINODEAPITOKEN ; history -d $(history 1)'
-  exit 1
-  fi
-
   echo ""
   read -p 'Total number of servers / shares (rec 4) : ' Nshares
   read -p 'Minimum shares requires (rec 3) : ' Krequired
@@ -353,6 +343,8 @@ then
     else
       cp conf/Dockerfile /tmp/Dockerfile
     fi
+    export sec srvi IPDIST IPHOST
+    envsubst < /tmp/Dockerfile
     sleep 4
     docker-machine scp /tmp/Dockerfile $nodename$srvi:~ >> $conserity_log_file
     docker-machine scp conf/nginx_docker.conf $nodename$srvi:~ >> $conserity_log_file
