@@ -183,7 +183,7 @@ cmd_prt "Setup host for the security"
 cp conf/sysctl.conf /etc/sysctl.conf
 
 [ -f "/etc/ssh/sshd_config.OLD" ] || mv /etc/ssh/sshd_config /etc/ssh/sshd_config.OLD
-cp conf/sshd_config /etc/ssh/sshd_config
+SSHPORT=$SSHPORT fileUSER=$fileUSER envsubst < conf/sshd_config > /etc/ssh/sshd_config
 
 rm -f /etc/ssh/ssh_host_*key*
 ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N "" < /dev/null >> $conserity_log_file
