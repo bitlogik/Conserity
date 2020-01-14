@@ -90,12 +90,11 @@ cmd_prt "Setup remote server #${srvi}"
 IPDIST=$(docker-machine ip $nodename$srvi)
 remexec="docker-machine ssh $nodename$srvi"
 if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
-  cp conf/DockerFileUb /tmp/Dockerfile
+  cp conf/DockerFileUb /tmp/DockerfileVars
 else
-  cp conf/DockerFile /tmp/Dockerfile
+  cp conf/DockerFile /tmp/DockerfileVars
 fi
-export sec srvi IPDIST IPHOST
-envsubst < /tmp/Dockerfile
+sec=$sec srvi=$srvi IPDIST=$IPDIST IPHOST=$IPHOST envsubst < /tmp/DockerfileVars > /tmp/Dockerfile
 sleep 4
 docker-machine scp /tmp/Dockerfile $nodename$srvi:~
 docker-machine scp conf/nginx_docker.conf $nodename$srvi:~
@@ -109,6 +108,7 @@ $remexec docker cp mynginx:/etc/nginx/cert_srv.pem cert_srv.pem
 docker-machine scp $nodename$srvi:~/cert_srv.pem ${CertsDIR}/cert_srv0${srvi}.crt
 ok
 rm -f /tmp/Dockerfile
+rm -f /tmp/DockerfileVars
 APIKey=" "
 sleep 1
 update-ca-certificates --fresh
