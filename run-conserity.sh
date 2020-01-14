@@ -391,12 +391,12 @@ crontab /var/spool/cron/crontabs/root
 ok
 
 # Delete remote servers access
-# if [ "$RemOpt" == '2' ] # and HTTPS access
-# then 
-  # cmd_prt "Clean up"
-  # rm -Rf ~/.docker/machine/machines/$nodename*
-  # ok
-# fi
+if [ "$RemOpt" == '2' ] # and HTTPS access
+then 
+  cmd_prt "Clean up"
+  rm -Rf ~/.docker/machine/machines/$nodename*
+  ok
+fi
 
 sep
 echo -e "Conserity configured everything successfully ! "
