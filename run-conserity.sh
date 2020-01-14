@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Conserity : Strengthen you server and protect your data
-# Copyright (C) 2019  BitLogiK
+# Copyright (C) 2019-2020  BitLogiK
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
