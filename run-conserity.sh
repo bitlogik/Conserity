@@ -143,9 +143,6 @@ then
   echo ""
   read -p 'Total number of servers / shares (rec 4) : ' Nshares
   read -p 'Minimum shares requires (rec 3) : ' Krequired
-
-  echo ""
-  echo "Using $RemoteProvider01 VPS provider"
 fi
 
 # Initial update and clean up
