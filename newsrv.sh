@@ -88,7 +88,8 @@ export -f test_file
 ok
 cmd_prt "Setup remote server #${srvi}"
 IPDIST=$(docker-machine ip $nodename$srvi)
-remexec="docker-machine ssh $nodename$srvi"    if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
+remexec="docker-machine ssh $nodename$srvi"
+if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
   cp conf/DockerfileUb /tmp/Dockerfile
 else
   cp conf/Dockerfile /tmp/Dockerfile
