@@ -268,7 +268,7 @@ then
 
   for srvi in $(seq $Nshares)
   do
-    echo -e "\nAt which VPS cloud provider would you set the #${srvi} server ?"
+    echo -e "\nAt which VPS cloud provider setting the #${srvi} Shamir share remote server?"
     echo " 1) Digital Ocean"
     echo " 2) Linode"
     echo " 3) Scaleway"
