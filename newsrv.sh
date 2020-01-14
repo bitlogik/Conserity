@@ -66,6 +66,7 @@ echo -e "\nAt which VPS cloud provider would you set the #${srvi} server ?"
 echo " 1) Digital Ocean"
 echo " 2) Linode"
 echo " 3) Scaleway"
+echo " 4) Vultr"
 read -p ' Choice : ' ProvChoice
 case $ProvChoice in
 "1")
@@ -79,6 +80,10 @@ case $ProvChoice in
 "3")
 	ProvName="Scaleway"
 	ProvScript=sw
+	;;
+"4")
+	ProvName="Vultr"
+	ProvScript=vultr
 	;;
 esac
 read -p " Input your ${ProvName} API key : " APIKey
