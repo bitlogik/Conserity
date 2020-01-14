@@ -87,7 +87,7 @@ chmod +x run-conserity.sh
 chmod +x getpwd
 chmod +x shamir/split_secret.py
 chmod +x shamir/recover_secret.py
-chmod +x vps-drivers/create-linode.sh
+chmod +x vps-drivers/create-*.sh
 ```
 
 or with git
