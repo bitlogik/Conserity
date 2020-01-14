@@ -62,7 +62,7 @@ sep
 cmd_prt "Detecting host Linux system"
 
 # To Do : system detection and adapt script
-if ! (cat /etc/os-release | grep -E "10 (buster)|18\.04\..+ LTS \(Bionic Beaver\)|19\.04 \(Disco Dingo\)|19\.10 \(Eoan Ermine\)" > /dev/null ) then
+if ! (cat /etc/os-release | grep -E "10 \(buster\)|18\.04\..+ LTS \(Bionic Beaver\)|19\.04 \(Disco Dingo\)|19\.10 \(Eoan Ermine\)" > /dev/null ) then
   echo "For now, Conserity only runs on Debian 10, Ubuntu 18.04, 19.04 or 19.10."
   exit 1
 fi
