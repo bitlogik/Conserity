@@ -340,9 +340,9 @@ then
     IPDIST=$(docker-machine ip $nodename$srvi)
     remexec="docker-machine ssh $nodename$srvi"
     if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
-      cp conf/DockerFileUb /tmp/Dockerfile
+      cp conf/DockerFileUb /tmp/DockerfileVars
     else
-      cp conf/DockerFile /tmp/Dockerfile
+      cp conf/DockerFile /tmp/DockerfileVars
     fi
     seci=${sec[$srvi]} IPDIST=$IPDIST IPHOST=$IPHOST envsubst < /tmp/DockerfileVars > /tmp/Dockerfile
     sleep 4
@@ -359,6 +359,7 @@ then
     ok
   done
   rm -f /tmp/Dockerfile
+  rm -f /tmp/DockerfileVars
   APIKey=" "
 
   # install the self-signed certificates of the remote servers
