@@ -27,6 +27,9 @@ then
 fi
 
 docker-machine create -d vultr --vultr-api-key=$2 --vultr-region-id=9 --vultr-os-id=179 --vultr-plan-id=201 $1 || :
+
+# Workaround of this 2 years old driver
+# from https://github.com/janeczku/docker-machine-vultr/issues/41#issuecomment-478247699
 docker-machine stop $1 || :
 docker-machine start $1 || :
 docker-machine start $1 || :
