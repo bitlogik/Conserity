@@ -87,12 +87,6 @@ IPHOST=$(ip route get 1 | sed -n 's/^.*src \([0-9.]*\) .*$/\1/p')
 
 export DEBIAN_FRONTEND=noninteractive
 
-cmd_prt "Quick install for DNS check"
-echo ""
-apt-get -y update > $conserity_log_file
-apt-get -y install dnsutils >> $conserity_log_file
-ok
-
 # Users and Server Parameters
 
 # ToDo check inputs
@@ -100,7 +94,8 @@ ok
 echo ""
 echo 'Input the host web domain of this server (DNS A to the server IP) :'
 read -p '> ' HOSTDOMAIN
-if [[ $(dig +short $HOSTDOMAIN) != $IPHOST ]]
+if [[ $(host $HOSTDOMAIN | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}') != $IPHOST ]]
+ 
 then
   echo "Network tests show that this domain is not linked to this"
   echo "server IP ($IPHOST)."
@@ -157,6 +152,7 @@ fi
 
 echo ""
 cmd_prt "System packages update"
+apt-get -y update > $conserity_log_file
 apt-get -y upgrade >> $conserity_log_file
 ok
 
