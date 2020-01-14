@@ -1,3 +1,6 @@
+
+# SSHd configuration by Conserity
+
 Protocol 2
 HostKey /etc/ssh/ssh_host_ed25519_key
 HostKey /etc/ssh/ssh_host_rsa_key
