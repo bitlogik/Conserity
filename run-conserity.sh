@@ -322,14 +322,33 @@ then
 
   for srvi in $(seq $Nshares)
   do
-    cmd_prt "Creating the remote server #${srvi} at Linode"
+    echo -e "\nAt which VPS cloud provider would you set the #${srvi} server ?"
+    echo " 1) Digital Ocean"
+    echo " 2) Linode"
+    echo " 3) Scaleway"
+    read -p ' Choice : ' ProvChoice
+    case $ProvChoice in
+    "1")
+        ProvName="Digital Ocean"
+        ProvScript=do
+        ;;
+    "2")
+        ProvName="Linode"
+        ProvScript=linode
+        ;;
+    "3")
+        ProvName="Scaleway"
+        ProvScript=sw
+        ;;
+    esac
+    read -p " Input your ${ProvName} API key : " APIKey
+    cmd_prt "Creating the remote server #${srvi} at ${ProvName}"
     export -f test_file
-    ./vps-drivers/create-linode.sh $nodename$srvi
+    ./vps-drivers/create-${ProvScript}.sh $nodename$srvi $APIKey
     ok
     cmd_prt "Setup remote server #${srvi}"
     IPDIST=$(docker-machine ip $nodename$srvi)
-    remexec="docker-machine ssh $nodename$srvi"
-    if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
+    remexec="docker-machine ssh $nodename$srvi"    if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
       cp conf/DockerfileUb /tmp/Dockerfile
     else
       cp conf/Dockerfile /tmp/Dockerfile
@@ -340,7 +359,7 @@ then
     docker-machine scp conf/openssl.cnf $nodename$srvi:~ >> $conserity_log_file
     docker-machine scp conf/dhparam.pem $nodename$srvi:~ >> $conserity_log_file
     $remexec sudo systemctl enable docker &>> $conserity_log_file
-    $remexec sudo systemctl stop update-engine >> $conserity_log_file
+    $remexec sudo systemctl stop update-engine || :
     $remexec docker build -t mynginximage1 . >> $conserity_log_file
     $remexec docker run --restart always -p 443:443 --name mynginx -d mynginximage1 >> $conserity_log_file
     $remexec docker cp mynginx:/etc/nginx/cert_srv.pem cert_srv.pem
@@ -348,17 +367,16 @@ then
     ok
   done
   rm -f /tmp/Dockerfile
+  APIKey=" "
 
   # install the self-signed certificates of the remote servers
   update-ca-certificates --fresh >> $conserity_log_file
+  sleep 2
 
   # IP list of the client nodes
   # into a list used by getpwd
 
   fileIPclients=/root/ip_client
-  echo ""
-  cmd_prt "Creating the encrypted partition"
-
   docker-machine ip $(seq -f $nodename%1.f -s \  $Nshares) > $fileIPclients
 
   # test secret reading in the client servers
@@ -366,6 +384,9 @@ then
     echo "ERROR : issue with remote servers"
     exit 1
   fi
+
+  echo ""
+  cmd_prt "Creating the encrypted partition"
 
   echo "This can takes some time (5'000MB ~ 1min)"
   fallocate -l ${PDISKSZ}M /root/encryptdisk01
