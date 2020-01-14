@@ -67,9 +67,8 @@ VPS instance providers :
 * Vultr
 * Linode
 * Scaleway
-* AWS
+* AWS (soon)
 * Potentially any provider which has a docker-machine plugin  
-Only Linode for now.
 
 Web services protected :
 * internal web server (node, Kore.io, ... )
@@ -101,10 +100,8 @@ cd Conserity
 
 #### Run
 
-If you plan to use the Shamir split secret, you need to define the LinodeAPIKey bash variable with your Linode APIv4 access token.
-```
-export LinodeAPIKey=YOURLINODEAPITOKEN ; history -d $(history 1)
-```
+If you plan to use the Shamir split secret, you need to have the API keys of the VPS providers (such as DigitalOcean, Vultr, Linode, Scaleway,...).
+
 Else, you just need a single remote Apache web server (a different server from where you install Conserity).
 
 
@@ -147,13 +144,6 @@ The remote instance names are using an host ID as follow :
 ```
 cat /etc/machine-id | sha256sum | cut -c1-8
 ```
-
-For now, the remote instances provider (for automatic Shamir install) is Linode.
-We plan to add many others providers such as : 
-* DigitalOcean
-* Vultr
-* Scaleway
-* AWS
 
 #### Use
 
