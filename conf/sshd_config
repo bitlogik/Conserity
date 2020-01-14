@@ -1,0 +1,23 @@
+Protocol 2
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+Port $SSHPORT
+AcceptEnv LANG LC_*
+Subsystem       sftp    /usr/lib/openssh/sftp-server
+AddressFamily inet
+X11Forwarding no
+AllowAgentForwarding no
+MaxAuthTries 4
+KexAlgorithms curve25519-sha256@libssh.org
+HostKeyAlgorithms ssh-ed25519,ssh-rsa
+Ciphers aes256-gcm@openssh.com,aes256-ctr,chacha20-poly1305@openssh.com
+MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com
+AllowUsers root $fileUSER
+PermitRootLogin prohibit-password
+AllowTcpForwarding no
+AllowStreamLocalForwarding no
+GatewayPorts no
+PermitTunnel no
+ChallengeResponseAuthentication no
+UsePAM no
+PrintMotd no

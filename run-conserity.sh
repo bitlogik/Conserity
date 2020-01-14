@@ -180,46 +180,10 @@ fi
 cmd_prt "Setup host for the security"
 
 [ -f "/etc/sysctl.conf.OLD" ] || mv /etc/sysctl.conf /etc/sysctl.conf.OLD
-cat <<EOF > /etc/sysctl.conf
-net.ipv4.conf.default.rp_filter=1
-net.ipv4.conf.all.rp_filter=1
-net.ipv4.conf.all.accept_redirects = 0
-net.ipv6.conf.all.accept_redirects = 0
-net.ipv4.conf.all.send_redirects = 0
-net.ipv4.conf.all.accept_source_route = 0
-net.ipv6.conf.all.accept_source_route = 0
-net.ipv6.conf.all.disable_ipv6 = 1
-net.ipv6.conf.default.disable_ipv6 = 1
-net.ipv6.conf.lo.disable_ipv6 = 1
-net.ipv6.conf.eth0.disable_ipv6 = 1
-EOF
+cp conf/sysctl.conf /etc/sysctl.conf
 
 [ -f "/etc/ssh/sshd_config.OLD" ] || mv /etc/ssh/sshd_config /etc/ssh/sshd_config.OLD
-cat <<EOF > /etc/ssh/sshd_config
-Protocol 2
-HostKey /etc/ssh/ssh_host_ed25519_key
-HostKey /etc/ssh/ssh_host_rsa_key
-Port $SSHPORT
-AcceptEnv LANG LC_*
-Subsystem       sftp    /usr/lib/openssh/sftp-server
-AddressFamily inet
-X11Forwarding no
-AllowAgentForwarding no
-MaxAuthTries 4
-KexAlgorithms curve25519-sha256@libssh.org
-HostKeyAlgorithms ssh-ed25519,ssh-rsa
-Ciphers aes256-gcm@openssh.com,aes256-ctr,chacha20-poly1305@openssh.com
-MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com
-AllowUsers root $fileUSER
-PermitRootLogin prohibit-password
-AllowTcpForwarding no
-AllowStreamLocalForwarding no
-GatewayPorts no
-PermitTunnel no
-ChallengeResponseAuthentication no
-UsePAM no
-PrintMotd no
-EOF
+cp conf/sshd_config /etc/ssh/sshd_config
 
 rm -f /etc/ssh/ssh_host_*key*
 ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N "" < /dev/null >> $conserity_log_file
