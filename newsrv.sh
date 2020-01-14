@@ -90,9 +90,9 @@ cmd_prt "Setup remote server #${srvi}"
 IPDIST=$(docker-machine ip $nodename$srvi)
 remexec="docker-machine ssh $nodename$srvi"
 if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
-  cp conf/DockerfileUb /tmp/Dockerfile
+  cp conf/DockerFileUb /tmp/Dockerfile
 else
-  cp conf/Dockerfile /tmp/Dockerfile
+  cp conf/DockerFile /tmp/Dockerfile
 fi
 export sec srvi IPDIST IPHOST
 envsubst < /tmp/Dockerfile
