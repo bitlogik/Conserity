@@ -250,13 +250,13 @@ else
   ok "SKIPPED"
 fi
 
+hostid=$(cat /etc/machine-id | sha256sum | cut -c1-8)
 
 # Create remote servers
 
 if [ "$RemOpt" == '2' ]
 then
 
-  hostid=$(cat /etc/machine-id | sha256sum | cut -c1-8)
   nodename="conserity-$hostid-client0"
 
   # To Do : Manage partial installation of the machines
@@ -367,7 +367,7 @@ then
   cat <<EOF > $PWD/getpwd
 #!/bin/sh -e
 
-a=\`wget --user UserConsY --password $WEBACCESS --no-cache --no-cookies -q -U 'ag3nt12340pw38' -O- https://${WEBDOMAIN}/protect/${webfile}\`
+a=\`wget --user UserConsY --password $WEBACCESS --no-cache --no-cookies -q -U 'ag3nt12340pw38' -O- https://${WEBDOMAIN}/prot-${hostid}/${webfile}\`
 echo \$a
 EOF
 
@@ -417,15 +417,15 @@ then
 
   echo ""
   echo "Put in the the ${WEBDOMAIN} remote server :"
-  echo "-  <WebRoot>/protect/$webfile file content (no line return) :"
+  echo "-  <WebRoot>/prot-$hostid/$webfile file content (no line return) :"
   echo $PASSWORD
   echo ""
-  echo "and additionally in that remote \"protect\" directory :"
+  echo "and additionally in that remote \"prot-$hostid\" directory :"
   echo "-  .htpasswd file content :"
   echo "UserConsY:$(openssl passwd -apr1 --salt s4lto932 $WEBACCESS)"
   echo ""
   echo "-  .htaccess file content :"
-  echo "AuthUserFile /<PATH/TO/WebRoot>/protect/.htpasswd"
+  echo "AuthUserFile /<PATH/TO/WebRoot>/prot-$hostid/.htpasswd"
   echo "AuthGroupFile /dev/null"
   echo "AuthName \"Private access\""
   echo "AuthType Basic"
