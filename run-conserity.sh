@@ -250,13 +250,13 @@ else
   ok "SKIPPED"
 fi
 
+hostid=$(cat /etc/machine-id | sha256sum | cut -c1-8)
 
 # Create remote servers
 
 if [ "$RemOpt" == '2' ]
 then
 
-  hostid=$(cat /etc/machine-id | sha256sum | cut -c1-8)
   nodename="conserity-$hostid-client0"
 
   # To Do : Manage partial installation of the machines
