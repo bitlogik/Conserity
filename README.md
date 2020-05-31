@@ -10,7 +10,7 @@ Free, open-source and collaborative
 
 ## The software project
 
-Creates a protected directory in the user home. This protected directory is encrypted and is only clear-text in the server's RAM. This encryption is virtually transparent for performance and the data content.
+Creates a protected directory in the user home. This protected directory is encrypted and is only clear-text in the server\'s RAM. This encryption is virtually transparent for performance and the data content.
 
 Additionally, Conserity setups the access and configures the server for maximum security.
 
@@ -30,6 +30,7 @@ https://conserity.org
 ## Use cases examples
 
 Can be used to protect the following apps :
+
 * Messaging server (Mastodon, Matrix/Riot, )
 * Central software repository (Gitea, GitLab, Gogs, )
 * Software CI/CD (Jenkins, Jira, )
@@ -59,21 +60,25 @@ If you choose the Shamir secret split of the encryption key in several remote se
 #### Compatibility
 
 OS : Linux based
+
 * Debian, Ubuntu
 * Fedora , CentOS , RHEL  (later)
 
 VPS instance providers :
+
 * DigitalOcean
-* Vultr (experimental)
+* Vultr (unstable)
 * Linode
 * Scaleway
 * AWS (soon)
 * Potentially any provider which has a docker-machine plugin  
 
 Web services protected :
+
 * internal web server (node, Kore.io, ... )
 * PHP (web files)
-* WSGI (Python uWSGI, ...)  
+* WSGI (Python uWSGI, ...)
+
 Only internal web server for now.
 
 #### Install
@@ -118,7 +123,7 @@ Follow the instructions. You can choose :
 * Type of setup :
   * Single secret with displayed setting for Apache
   * Shamir split secret, with automatic instances installation
-* Type of web service : Web, PHP, UWSGI (Not yet availaible)
+* Type of web service : Web, PHP, UWSGI (Not yet available)
 
 Conserity performs the following :
 
@@ -153,16 +158,18 @@ Also, the server is secured with infosec best practices (Web server, SSH, firewa
 
 What does it protect ?  
 Conserity strengthens your server security and encrypts your data on the disk. It protects against :
+
 * Unauthorized access in your server (more difficult to break in)
 * Data read from the disk, or from any backup, disk snapshot,...
 * Spying or wiretapping of the web session of the users (web server is configured for security)
 
 What does it NOT protect ?  
 It does NOT protect against :
+
 * Authorized legitimate access in the server (rogue employee, accidental deletion,...)
 * A present "hole" in the server used softwares (OpenSSL, nginx,...)
 * Your own web app leaks, for example if it gives some secrets to anyone
-* A user of the web app is hacked/infected, so the data (s)he's reading is leaked.
+* A user of the web app is hacked/infected, so the data (s)he\'s reading is leaked.
 * Data deletion. Conserity is not a backup system. Nevertheless, it helps to backup, since any data in the protected folder is securely encrypted.
 
 Why is my email address needed ?  
@@ -187,5 +194,6 @@ email : project@conserity.org
 
 * Add more HTTP headers
 * Add others web service types : PHP/HTML and WSGI
-* Ubuntu compatibility (and then Fedora/CentOS/RHEL)
-* Add others VPS providers : Vultr, Scaleway, then DigitalOcean and AWS
+* OpenBSD and Fedora/CentOS/RHEL compatibility
+* Add others VPS providers : AWS
+
