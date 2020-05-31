@@ -61,6 +61,7 @@ If you choose the Shamir secret split of the encryption key in several remote se
 OS : Linux based
 * Debian, Ubuntu
 * Fedora , CentOS , RHEL  (later)
+* OpenBSD (in progress)
 
 VPS instance providers :
 * DigitalOcean
@@ -98,6 +99,14 @@ git clone https://github.com/BitLogiK/Conserity.git
 cd Conserity
 ```
 
+On OpenBSD 
+
+```
+pkg_add git
+git clone https://github.com/BitLogiK/Conserity.git
+cd Conserity
+```
+
 #### Run
 
 If you plan to use the Shamir split secret, you need to have the API keys of the VPS providers (such as DigitalOcean, Vultr, Linode, Scaleway,...).
@@ -105,10 +114,16 @@ If you plan to use the Shamir split secret, you need to have the API keys of the
 Else, you just need a single remote Apache web server (a different server from where you install Conserity).
 
 
-Run Conserity in the main server :
+Run Conserity in the main Linux server :
 
 ```
 ./run-conserity.sh
+```
+
+On OpenBSD :
+
+```
+ksh -e run-conserity.sh
 ```
 
 Follow the instructions. You can choose :
@@ -144,6 +159,8 @@ The remote instance names are using an host ID as follow :
 ```
 cat /etc/machine-id | sha256sum | cut -c1-8
 ```
+
+On OpenBSD, it uses ```sysctl hw.uuid | sha256 | cut -c1-8```
 
 #### Use
 
