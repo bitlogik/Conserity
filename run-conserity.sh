@@ -91,6 +91,13 @@ export DEBIAN_FRONTEND=noninteractive
 
 # ToDo check inputs
 
+
+if !(command -v host > /dev/null) then
+  cmd_prt "'host' command is not present"
+  apt-get -y update > $conserity_log_file
+  apt-get -y install bind9-host >> $conserity_log_file
+  ok
+fi
 echo ""
 echo 'Input the host web domain of this server (DNS A to the server IP) :'
 read -p '> ' HOSTDOMAIN
@@ -149,7 +156,7 @@ fi
 
 echo ""
 cmd_prt "System packages update"
-apt-get -y update > $conserity_log_file
+apt-get -y update >> $conserity_log_file
 apt-get -y upgrade >> $conserity_log_file
 ok
 
