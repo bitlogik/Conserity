@@ -93,7 +93,7 @@ export DEBIAN_FRONTEND=noninteractive
 
 
 if !(command -v host > /dev/null) then
-  cmd_prt "'host' command is not present"
+  cmd_prt "'host' command not present, installing it"
   apt-get -y update > $conserity_log_file
   apt-get -y install bind9-host >> $conserity_log_file
   ok
