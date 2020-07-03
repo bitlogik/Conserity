@@ -212,7 +212,7 @@ fi
 echo ""
 echo ""
 echo " CERTBOT LetsEncrypt info and licence :"
-certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --must-staple --test-cert -d $HOSTDOMAIN
+certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --must-staple --test-cert --register-unsafely-without-email -d $HOSTDOMAIN
 
 [ -f "/etc/nginx/nginx.conf.OLD" ] || mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.OLD
 cp -f conf/nginx.conf /etc/nginx/
