@@ -83,7 +83,7 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-IPHOST=$(ip route get 1 | sed -n 's/^.*src \([0-9.]*\) .*$/\1/p')
+IPHOST=$(curl -s https://api.ipify.org/)
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -91,6 +91,13 @@ export DEBIAN_FRONTEND=noninteractive
 
 # ToDo check inputs
 
+
+if !(command -v host > /dev/null) then
+  cmd_prt "'host' command not present, installing it"
+  apt-get -y update > $conserity_log_file
+  apt-get -y install bind9-host >> $conserity_log_file
+  ok
+fi
 echo ""
 echo 'Input the host web domain of this server (DNS A to the server IP) :'
 read -p '> ' HOSTDOMAIN
@@ -149,7 +156,7 @@ fi
 
 echo ""
 cmd_prt "System packages update"
-apt-get -y update > $conserity_log_file
+apt-get -y update >> $conserity_log_file
 apt-get -y upgrade >> $conserity_log_file
 ok
 
