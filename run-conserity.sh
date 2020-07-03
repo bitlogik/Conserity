@@ -83,7 +83,7 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-IPHOST=$(ip route get 1 | sed -n 's/^.*src \([0-9.]*\) .*$/\1/p')
+IPHOST=$(curl -s https://api.ipify.org/)
 
 export DEBIAN_FRONTEND=noninteractive
 
