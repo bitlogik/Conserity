@@ -184,6 +184,12 @@ fi
 
 # Configure host for security
 
+cmd_prt "Generating new SSH keys"
+rm -f /etc/ssh/ssh_host_*key* >> $conserity_log_file
+ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N "" < /dev/null >> $conserity_log_file
+ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N "" < /dev/null >> $conserity_log_file
+ok
+
 cmd_prt "Setup host for the security"
 
 [ -f "/etc/sysctl.conf.OLD" ] || mv /etc/sysctl.conf /etc/sysctl.conf.OLD
@@ -191,10 +197,6 @@ cp conf/sysctl.conf /etc/sysctl.conf
 
 [ -f "/etc/ssh/sshd_config.OLD" ] || mv /etc/ssh/sshd_config /etc/ssh/sshd_config.OLD
 SSHPORT=$SSHPORT fileUSER=$fileUSER envsubst < conf/sshd_config > /etc/ssh/sshd_config
-
-rm -f /etc/ssh/ssh_host_*key*
-ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N "" < /dev/null >> $conserity_log_file
-ssh-keygen -t rsa -b 4096 -f /etc/ssh/ssh_host_rsa_key -N "" < /dev/null >> $conserity_log_file
 
 sysctl -p &>> $conserity_log_file || : 
 service sshd restart >> $conserity_log_file
@@ -417,6 +419,17 @@ echo -e "\n !!! Your SSH link will display a warning about the server"
 echo -e "     keys change, just update the server public key"
 echo -e "     in your SSH client."
 echo "SSHd will listen to port $SSHPORT"
+echo ""
+echo " --- New SSH keys fingerprint :"
+echo "RSA4096 (old PuTTY format)"
+ssh-keygen -l -E md5 -f /etc/ssh/ssh_host_rsa_key
+echo "RSA4096 (new format)"
+ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key
+echo "Ed25519 (old PuTTY format)"
+ssh-keygen -l -E md5 -f /etc/ssh/ssh_host_ed25519_key
+echo "Ed25519 (new format)"
+ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key
+echo ""
 
 if [ "$RemOpt" == '1' ]
 then
