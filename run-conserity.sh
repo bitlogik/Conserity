@@ -470,7 +470,8 @@ echo -e "reading the secret from the remote server(s).\n"
 
 if [ "$RemOpt" == '1' ]
 then
-  echo "Once you put the files in the ${WEBDOMAIN} remote web server,"
+  echo "Once you put the files in the ${WEBDOMAIN} remote web server"
+  echo "and tested here with ./getpwd,"
 fi
 echo -e "you can reboot the machine to finish the installation."
 
