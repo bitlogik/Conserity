@@ -210,14 +210,14 @@ cmd_prt "Configuring the user"
 if !(id -u $fileUSER &> /dev/null) then
   echo ""
   echo ""
-  adduser --disabled-password --gecos "" myuser
-  mkdir -p /home/myuser/.ssh
-  cp ~/.ssh/authorized_keys /home/myuser/.ssh/authorized_keys
-  chown -R myuser /home/myuser/.ssh
-  chgrp myuser /home/myuser/.ssh
-  chown -R :myuser /home/myuser/.ssh
-  chmod u=rwx,go=  /home/myuser/.ssh
-  chmod u=rw,go=  /home/myuser/.ssh/*
+  adduser --disabled-password --gecos "" $fileUSER
+  mkdir -p /home/$fileUSER/.ssh
+  cp ~/.ssh/authorized_keys /home/$fileUSER/.ssh/authorized_keys
+  chown -R $fileUSER /home/$fileUSER/.ssh
+  chgrp $fileUSER /home/$fileUSER/.ssh
+  chown -R :$fileUSER /home/$fileUSER/.ssh
+  chmod u=rwx,go=  /home/$fileUSER/.ssh
+  chmod u=rw,go=  /home/$fileUSER/.ssh/*
   systemctl reload sshd
   ok
 else
