@@ -254,7 +254,9 @@ if !(id -u $fileUSER &> /dev/null) then
   echo ""
   adduser --disabled-password --gecos "" $fileUSER
   mkdir -p /home/$fileUSER/.ssh
-  cp ~/.ssh/authorized_keys /home/$fileUSER/.ssh/authorized_keys
+  if [ -f ~/.ssh/authorized_keys ]; then
+    cp ~/.ssh/authorized_keys /home/$fileUSER/.ssh/authorized_keys
+  fi
   chown -R $fileUSER /home/$fileUSER/.ssh
   chgrp $fileUSER /home/$fileUSER/.ssh
   chown -R :$fileUSER /home/$fileUSER/.ssh
