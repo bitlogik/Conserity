@@ -73,7 +73,14 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-IPHOST=$(wget -qO- https://api.ipify.org/)
+if [ -x "$(which curl)" ]; then
+  IPHOST=$(curl -s https://api.ipify.org/)
+elif [ -x "$(which wget)" ]; then
+  IPHOST=$(wget -qO- https://api.ipify.org/)
+else
+  echo "Please install wget."
+  exit 1
+fi
 
 export DEBIAN_FRONTEND=noninteractive
 
