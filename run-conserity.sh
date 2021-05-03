@@ -252,8 +252,15 @@ cmd_prt "Configuring the user"
 if !(id -u $fileUSER &> /dev/null) then
   echo ""
   echo ""
-  echo " PASSWORD for user $fileUSER :"
-  adduser $fileUSER
+  adduser --disabled-password --gecos "" $fileUSER
+  mkdir -p /home/$fileUSER/.ssh
+  cp ~/.ssh/authorized_keys /home/$fileUSER/.ssh/authorized_keys
+  chown -R $fileUSER /home/$fileUSER/.ssh
+  chgrp $fileUSER /home/$fileUSER/.ssh
+  chown -R :$fileUSER /home/$fileUSER/.ssh
+  chmod u=rwx,go=  /home/$fileUSER/.ssh
+  chmod u=rw,go=  /home/$fileUSER/.ssh/*
+  systemctl reload sshd
   ok
 else
   ok "SKIPPED"
