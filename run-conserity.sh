@@ -164,7 +164,7 @@ ok
 
 cmd_prt "Install packages needed"
 echo ""
-apt-get -y -qq install certbot nginx-light ufw cryptsetup unzip wget >> $conserity_log_file
+apt-get -y -qq install openssh-server certbot nginx-light ufw cryptsetup unzip wget >> $conserity_log_file
 ok
 
 # install docker-machine
