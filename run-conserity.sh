@@ -217,7 +217,9 @@ if !(id -u $fileUSER &> /dev/null) then
   chgrp $fileUSER /home/$fileUSER/.ssh
   chown -R :$fileUSER /home/$fileUSER/.ssh
   chmod u=rwx,go=  /home/$fileUSER/.ssh
-  chmod u=rw,go=  /home/$fileUSER/.ssh/*
+  if [ -n "$(ls -A /home/$fileUSER/.ssh)" ]; then
+    chmod u=rw,go=  /home/$fileUSER/.ssh/*
+  fi
   systemctl reload sshd
   ok
 else
