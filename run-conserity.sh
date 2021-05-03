@@ -176,7 +176,7 @@ fi
 echo ""
 echo ""
 echo " CERTBOT LetsEncrypt info and licence :"
-certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --must-staple -d $HOSTDOMAIN
+certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --server 'https://api.buypass.com/acme/directory' -d $HOSTDOMAIN
 
 [ -f "/etc/nginx/nginx.conf.OLD" ] || mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.OLD
 cp -f conf/nginx.conf /etc/nginx/
@@ -227,7 +227,7 @@ fi
 hostid=$(cat /etc/machine-id | sha256sum | cut -c1-8)
 
 
-echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
+echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" --server 'https://api.buypass.com/acme/directory' -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
 crontab /var/spool/cron/crontabs/root
 ok
 
