@@ -8,6 +8,8 @@ Convenient and secure, for the IT serenity
 
 Free, open-source and collaborative
 
+This "proxy" branch only sets up SSH and a HTTPS proxy, and does not setup an encrypted directory (as the "master" branch does additionally). All further references to an encrypted directory and remote keys don\'t apply to this branch.
+
 ## The software project
 
 Creates a protected directory in the user home. This protected directory is encrypted and is only clear-text in the server\'s RAM. This encryption is virtually transparent for performance and the data content.
@@ -50,12 +52,15 @@ Can be used to protect the following apps :
 
 #### Prerequisite
 
-A Debian 10 or Ubuntu 18.04+ system  
+A Debian 10 or Ubuntu 18.04-20.04 system  
 with its IP on a domain
 
 You must create an A record for your domain that points to the IP address of the server instance. If your server is behind a NAT, then you need to forward port # 80 to your instance.
 
-If you choose the Shamir secret split of the encryption key in several remote servers, you need to have and provide a Linode API key.
+If you choose the Shamir secret split of the encryption key in several remote servers, you need to have and provide all VPS providers API key.
+
+Note : There\'s a "proxy" branch, which removes all parts related to disk encryption. It is useful to easily configure a HTTP server : it configures SSH access, HTTP server, setup TLS certificate and their renawal, and secure the access and the services. All what the master branch does, except the encrypted directory and its remote key.
+
 
 #### Compatibility
 
@@ -179,6 +184,26 @@ Why I get a security alert when I connect again on SSH ? Is it an intermediate s
 Absolutely not, you still connect directly to your server SSHd and without anything in the middle. Conserity just generates new SSH keys to be sure the used ones are robust. So the SSH keys are changed and thus eventually triggering an alert about the server has changed its host key.
 
 ## Support or Questions
+
+### Most common issues :
+
+Because of the focus on high security, some configuration are causing some issues.
+
+- You can't get from another server using git or SSH with your local agent. The agent forwarding is blocked by the configuration. If you need to auth with your local agent, to an other SSH service, through the current server installed, change AllowAgentForwarding to "yes" in /etc/ssh/sshd_config. This is common when you get some softwares with git clone, and auth with your agent, right after a Conserity installation.
+
+- If your web application has some Javacript "eval", it is blocked by the NGINX proxy configuration. You can change or remove Content-Security-Policy header in /etc/nginx/nginx.conf and restart nginx "service nginx restart". We advise you to better remove all evals and let as teh config is.
+
+- On some cloud providers using LAN routing such as ScaleWay, the current configuration makes the cnetwork connection drops after the DHCP lease time (mostly 24h). You need to make this modification in /etc/sysctl.conf and disable IPv6 in web console server configuration interface.
+```
+net.ipv4.conf.all.accept_redirects = 1
+net.ipv4.conf.all.send_redirects = 1
+net.ipv4.conf.all.accept_source_route = 1
+```
+Then "sysctl -p" to apply (or reboot).
+
+- If there an issue during the Conserity run that you don't understand, look at the log file for further details : log/output.log
+
+### Contact
 
 email : support@conserity.org
 
