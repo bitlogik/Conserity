@@ -214,9 +214,6 @@ cmd_prt "Configuring the web server"
 service nginx stop >> $conserity_log_file
 ufw disable >> $conserity_log_file
 
-if !(id -u nginx &> /dev/null) then
-  adduser --system --no-create-home --shell /bin/false --group --disabled-login nginx
-fi
 
 echo ""
 echo ""
