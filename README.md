@@ -50,7 +50,7 @@ Can be used to protect the following apps :
 
 #### Prerequisite
 
-A Debian 10 or Ubuntu 18.04-20.04 system  
+A Debian 10-11 or Ubuntu 18.04-20.04 system  
 with its IP on a domain
 
 You must create an A record for your domain that points to the IP address of the server instance. If your server is behind a NAT, then you need to forward port # 80 to your instance.

@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # Conserity : Strengthen you server and protect your data
-# Copyright (C) 2019-2020  BitLogiK
+# Copyright (C) 2019-2022  BitLogiK
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ sep
 cmd_prt "Detecting host Linux system"
 
 # To Do : system detection and adapt script
-if ! (cat /etc/os-release | grep -E "10 \(buster\)|18\.04(\.[0-9]+)? LTS \(Bionic Beaver\)|19\.04 \(Disco Dingo\)|19\.10 \(Eoan Ermine\)|20\.04(\.[0-9]+)? LTS \(Focal Fossa\)" > /dev/null ) then
+if ! (cat /etc/os-release | grep -E "10 \(buster\)|11 \(bullseye\)|18\.04(\.[0-9]+)? LTS \(Bionic Beaver\)|19\.04 \(Disco Dingo\)|19\.10 \(Eoan Ermine\)|20\.04(\.[0-9]+)? LTS \(Focal Fossa\)" > /dev/null ) then
   echo "Conserity only runs on Debian 10, Ubuntu 18.04, 19.04, 19.10 or 20.04."
   exit 1
 fi
