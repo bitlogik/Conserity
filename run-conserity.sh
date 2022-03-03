@@ -19,7 +19,6 @@
 # #### Conserity Parameters ####
 
 conserity_log_file="log/output.log"
-DockerMachinev=v0.16.2
 
 # #### CONSERITY SCRIPT
 
@@ -40,15 +39,6 @@ sep() {
   echo ""
 }
 
-test_file () {
-  # test_file FileName SHA256sum
-  printf "\nTesting $1 ..."
-  if ! ( echo "$2 $1" | sha256sum --status -c - ) then
-    echo -e "\nERROR : File $1 is not present or corrupted"
-    exit 1
-  fi
-  printf "  file OK\n\n"
-}
 
 # ToDo : COLS=$(tput cols), tput cup $COL $ROW
 
@@ -83,41 +73,10 @@ if [[ $EUID -ne 0 ]]; then
   exit 1
 fi
 
-if [ -x "$(which curl)" ]; then
-  IPHOST=$(curl -s https://api.ipify.org/)
-elif [ -x "$(which wget)" ]; then
-  IPHOST=$(wget -qO- https://api.ipify.org/)
-else
-  echo "Please install wget."
-  exit 1
-fi
 
 export DEBIAN_FRONTEND=noninteractive
 
 # Users and Server Parameters
-
-# ToDo check inputs
-
-
-if !(command -v host > /dev/null) then
-  cmd_prt "'host' command not present, installing it"
-  apt-get -y update > $conserity_log_file
-  apt-get -y install bind9-host >> $conserity_log_file
-  ok
-fi
-echo ""
-echo 'Input the host web domain of this server (DNS A to the server IP) :'
-read -p '> ' HOSTDOMAIN
-if [[ $(host $HOSTDOMAIN | egrep -o '([0-9]{1,3}\.){3}[0-9]{1,3}') != $IPHOST ]]
- 
-then
-  echo "Network tests show that this domain is not linked to this"
-  echo "server IP ($IPHOST)."
-  echo "Did you create a DNS A record for $HOSTDOMAIN pointing to"
-  echo "the IP address of this server ?"
-  echo "Did you input properly the domain name ?"
-  exit 1
-fi
 
 echo ""
 read -p 'User for Conserity (created if not exist): ' fileUSER
@@ -134,30 +93,9 @@ echo ""
 read -p 'Conserity encrypted partition size (MB) : ' PDISKSZ
 echo ""
 echo "Conserity system option for the secret storage in the remote server(s) :"
-echo "1) In one existing remote web server,"
-echo "   configuration will be displayed."
-echo "2) In several remote web servers, using Shamir shares,"
-echo "   automatically setup at the VPS providers."
-read -p 'Your choice : ' RemOpt
+echo "In one existing remote web server,"
+echo "configuration will be displayed."
 
-# Soon more options
-#  Remote secret reading HTTPS or SSH
-#  Multiple VPS providers
-#  Service type : PHP, WSGI, local web server,...
-
-# web, php, uwsgi
-WebServiceType=web
-
-# VPS Providers
-
-# Remote Host
-# Linode, ( DigitalOcean, Vultr, AWS, Scaleway )
-if [ "$RemOpt" == '2' ]
-then
-  echo ""
-  read -p 'Total number of servers / shares (rec 4) : ' Nshares
-  read -p 'Minimum shares requires (rec 3) : ' Krequired
-fi
 
 # Initial update and clean up
 
@@ -171,23 +109,9 @@ ok
 
 cmd_prt "Install packages needed"
 echo ""
-apt-get -y -qq install openssh-server certbot nginx-light ufw cryptsetup unzip wget >> $conserity_log_file
+apt-get -y -qq install openssh-server ufw cryptsetup wget >> $conserity_log_file
 ok
 
-# install docker-machine
-if [ "$RemOpt" == '2' ]
-then
-  cmd_prt "Install docker-machine"
-  if ! (type docker-machine &> /dev/null)
-    then
-    dmurl=https://github.com/docker/machine/releases/download/$DockerMachinev
-    wget -q -O /tmp/docker-machine $dmurl/docker-machine-$(uname -s)-$(uname -m)
-    test_file /tmp/docker-machine a7f7cbb842752b12123c5a5447d8039bf8dccf62ec2328853583e68eb4ffb097
-    mv /tmp/docker-machine /usr/local/bin/docker-machine
-    chmod +x /usr/local/bin/docker-machine
-  fi
-  ok
-fi
 
 # Configure host for security
 
@@ -210,24 +134,7 @@ service sshd restart >> $conserity_log_file
 ok
 
 # Configure web service
-cmd_prt "Configuring the web server"
-service nginx stop >> $conserity_log_file
 ufw disable >> $conserity_log_file
-
-
-echo ""
-echo ""
-echo " CERTBOT Buypass Go SSL info and licence :"
-certbot certonly --standalone --rsa-key-size 4096 --no-eff-email --server 'https://api.buypass.com/acme/directory' -d $HOSTDOMAIN
-
-[ -f "/etc/nginx/nginx.conf.OLD" ] || mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.OLD
-cp -f conf/nginx.conf /etc/nginx/
-sed -i "s/DOMAIN/${HOSTDOMAIN}/g" /etc/nginx/nginx.conf
-cp -f conf/dhparam.pem /etc/nginx/
-service nginx start >> $conserity_log_file
-sleep 2
-echo QUIT | openssl s_client -connect $HOSTDOMAIN:443 -tls1_2 -status > /dev/null
-ok
 
 # Disable swap, so all in RAM
 cmd_prt "Disabling disk swap"
@@ -242,8 +149,8 @@ ufw default deny incoming >> $conserity_log_file
 ufw default allow outgoing >> $conserity_log_file
 ufw allow $SSHPORT/tcp >> $conserity_log_file
 ufw limit $SSHPORT/tcp >> $conserity_log_file
-ufw allow 443/tcp >> $conserity_log_file
-ufw allow 80/tcp >> $conserity_log_file
+# ufw allow 443/tcp >> $conserity_log_file
+# ufw allow 80/tcp >> $conserity_log_file
 ufw deny 68 >> $conserity_log_file
 ufw deny 5100 >> $conserity_log_file
 ufw allow 53 >> $conserity_log_file
@@ -276,126 +183,24 @@ fi
 
 hostid=$(cat /etc/machine-id | sha256sum | cut -c1-8)
 
-# Create remote servers
 
-if [ "$RemOpt" == '2' ]
-then
-
-  nodename="conserity-$hostid-client0"
-
-  # To Do : Manage partial installation of the machines
-  #         Add user/password access
-  #         Creation in parallel
-
-  sec=($(eval "./shamir/split_secret.py $Krequired $Nshares"))
-
-  CertsDIR=/usr/local/share/ca-certificates
-
-  for srvi in $(seq $Nshares)
-  do
-    echo -e "\nAt which VPS cloud provider setting the #${srvi} Shamir share remote server?"
-    echo " 1) Digital Ocean"
-    echo " 2) Linode"
-    echo " 3) Scaleway"
-    echo " 4) Vultr (experimental)"
-    read -p ' Choice : ' ProvChoice
-    case $ProvChoice in
-    "1")
-        ProvName="Digital Ocean"
-        ProvScript=do
-        ;;
-    "2")
-        ProvName="Linode"
-        ProvScript=linode
-        ;;
-    "3")
-        ProvName="Scaleway"
-        ProvScript=sw
-        ;;
-    "4")
-        ProvName="Vultr"
-        ProvScript=vultr
-        ;;
-    esac
-    read -p " Input your ${ProvName} API key : " APIKey
-    cmd_prt "Creating the remote server #${srvi} at ${ProvName}"
-    export -f test_file
-    ./vps-drivers/create-${ProvScript}.sh $nodename$srvi $APIKey
-    ok
-    cmd_prt "Setup remote server #${srvi}"
-    IPDIST=$(docker-machine ip $nodename$srvi)
-    remexec="docker-machine ssh $nodename$srvi"
-    if (cat /etc/os-release | grep -E "Ubuntu" > /dev/null) then
-      cp conf/DockerFileUb /tmp/DockerfileVars
-    else
-      cp conf/DockerFile /tmp/DockerfileVars
-    fi
-    seci=${sec[$srvi]} IPDIST=$IPDIST IPHOST=$IPHOST envsubst < /tmp/DockerfileVars > /tmp/Dockerfile
-    sleep 4
-    docker-machine scp /tmp/Dockerfile $nodename$srvi:~ >> $conserity_log_file
-    docker-machine scp conf/nginx_docker.conf $nodename$srvi:~ >> $conserity_log_file
-    docker-machine scp conf/openssl.cnf $nodename$srvi:~ >> $conserity_log_file
-    docker-machine scp conf/dhparam.pem $nodename$srvi:~ >> $conserity_log_file
-    $remexec sudo systemctl enable docker &>> $conserity_log_file
-    $remexec sudo systemctl stop update-engine || :
-    $remexec docker build -t mynginximage1 . >> $conserity_log_file
-    $remexec docker run --restart always -p 443:443 --name mynginx -d mynginximage1 >> $conserity_log_file
-    $remexec docker cp mynginx:/etc/nginx/cert_srv.pem cert_srv.pem
-    docker-machine scp $nodename$srvi:~/cert_srv.pem ${CertsDIR}/cert_srv0${srvi}.crt >> $conserity_log_file
-    ok
-  done
-  rm -f /tmp/Dockerfile
-  rm -f /tmp/DockerfileVars
-  APIKey=" "
-
-  # install the self-signed certificates of the remote servers
-  update-ca-certificates --fresh >> $conserity_log_file
-  sleep 2
-
-  # IP list of the client nodes
-  # into a list used by getpwd
-
-  fileIPclients=/root/ip_client
-  docker-machine ip $(seq -f $nodename%1.f -s \  $Nshares) > $fileIPclients
-
-  # test secret reading in the client servers
-  if ! ( ./getpwd $fileIPclients &> /dev/null ) then
-    echo "ERROR : issue with remote servers"
-    exit 1
-  fi
-
-  echo ""
-  cmd_prt "Creating the encrypted partition"
-
-  echo "This can takes some time (5'000MB ~ 1min)"
-  fallocate -l ${PDISKSZ}M /root/encryptdisk01
-  shred /root/encryptdisk01
-  echo ${sec[0]} | cryptsetup -q luksFormat /root/encryptdisk01 --pbkdf-memory 1024
-  echo ${sec[0]} | cryptsetup luksOpen /root/encryptdisk01 volume1
-
-fi
-
-if [ "$RemOpt" == '1' ]
-then
-  webfile=`openssl rand -hex 16`
-  read  -p 'Web server domain where you will put the password: ' WEBDOMAIN
-  PASSWORD=`openssl rand -base64 32`
-  WEBACCESS=`openssl rand -base64 16`
-  fallocate -l ${PDISKSZ}M /root/encryptdisk01
-  echo ""
-  cmd_prt "Creating the encrypted partition"
-  echo "This can takes some time (5'000MB ~ 1min)"
-  shred /root/encryptdisk01
-  echo $PASSWORD | cryptsetup -q luksFormat /root/encryptdisk01 --pbkdf-memory 1024
-  echo $PASSWORD | cryptsetup luksOpen /root/encryptdisk01 volume1
-  cat <<EOF > $PWD/getpwd
+webfile=`openssl rand -hex 16`
+read  -p 'Web server domain where you will put the password: ' WEBDOMAIN
+PASSWORD=`openssl rand -base64 32`
+WEBACCESS=`openssl rand -base64 16`
+fallocate -l ${PDISKSZ}M /root/encryptdisk01
+echo ""
+cmd_prt "Creating the encrypted partition"
+echo "This can takes some time (5'000MB ~ 1min)"
+shred /root/encryptdisk01
+echo $PASSWORD | cryptsetup -q luksFormat /root/encryptdisk01 --pbkdf-memory 1024
+echo $PASSWORD | cryptsetup luksOpen /root/encryptdisk01 volume1
+cat <<EOF > $PWD/getpwd
 #!/bin/sh -e
 
 a=\`wget --user UserConsY --password $WEBACCESS --no-cache --no-cookies -q -U 'ag3nt12340pw38' -O- https://${WEBDOMAIN}/prot-${hostid}/${webfile}\`
 echo \$a
 EOF
-
-fi
 
 
 mkfs.ext4 -j /dev/mapper/volume1 &>> $conserity_log_file
@@ -410,25 +215,17 @@ chown -R $fileUSER /home/$fileUSER/protected_files/*
 chgrp -R $fileUSER /home/$fileUSER/protected_files/*
 
 cat <<EOF > /root/mountsp.sh
-$PWD/getpwd $fileIPclients | $(type -P cryptsetup) luksOpen /root/encryptdisk01 volume1
+$PWD/getpwd | $(type -P cryptsetup) luksOpen /root/encryptdisk01 volume1
 mount /dev/mapper/volume1 /home/$fileUSER/protected_files
 EOF
 
 chmod +x $PWD/getpwd
 
 echo "@reboot  sleep 60 ; bash /root/mountsp.sh ; sleep 15 ; /usr/sbin/service nginx reload && openssl s_client -connect $HOSTDOMAIN:443 -status" > /var/spool/cron/crontabs/root
-echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" --server 'https://api.buypass.com/acme/directory' -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
 crontab /var/spool/cron/crontabs/root
 
 ok
 
-# Delete remote servers access
-if [ "$RemOpt" == '2' ] # and HTTPS access
-then 
-  cmd_prt "Clean up"
-  rm -Rf ~/.docker/machine/machines/$nodename*
-  ok
-fi
 
 sep
 echo -e "Conserity configured everything successfully ! "
@@ -448,33 +245,30 @@ echo "Ed25519 (new format)"
 ssh-keygen -l -f /etc/ssh/ssh_host_ed25519_key
 echo ""
 
-if [ "$RemOpt" == '1' ]
-then
-  sep
+sep
 
-  echo ""
-  echo "Put in the the ${WEBDOMAIN} remote server :"
-  echo "-  <WebRoot>/prot-$hostid/$webfile file content (no line return) :"
-  echo $PASSWORD
-  echo ""
-  echo "and additionally in that remote \"prot-$hostid\" directory :"
-  echo "-  .htpasswd file content :"
-  echo "UserConsY:$(openssl passwd -apr1 --salt s4lto932 $WEBACCESS)"
-  echo ""
-  echo "-  .htaccess file content :"
-  echo "AuthUserFile /<PATH/TO/WebRoot>/prot-$hostid/.htpasswd"
-  echo "AuthGroupFile /dev/null"
-  echo "AuthName \"Private access\""
-  echo "AuthType Basic"
-  echo "<RequireAll>"
-  echo "  Require valid-user"
-  echo "  Require expr %{HTTP_USER_AGENT} == 'ag3nt12340pw38'"
-  echo "  Require ip $IPHOST"
-  echo "</RequireAll>"
-  echo ""
-  echo ""
-  sep
-fi
+echo ""
+echo "Put in the the ${WEBDOMAIN} remote server :"
+echo "-  <WebRoot>/prot-$hostid/$webfile file content (no line return) :"
+echo $PASSWORD
+echo ""
+echo "and additionally in that remote \"prot-$hostid\" directory :"
+echo "-  .htpasswd file content :"
+echo "UserConsY:$(openssl passwd -apr1 --salt s4lto932 $WEBACCESS)"
+echo ""
+echo "-  .htaccess file content :"
+echo "AuthUserFile /<PATH/TO/WebRoot>/prot-$hostid/.htpasswd"
+echo "AuthGroupFile /dev/null"
+echo "AuthName \"Private access\""
+echo "AuthType Basic"
+echo "<RequireAll>"
+echo "  Require valid-user"
+echo "  Require expr %{HTTP_USER_AGENT} == 'ag3nt12340pw38'"
+echo "  Require ip <<IP of this server>>"
+echo "</RequireAll>"
+echo ""
+echo ""
+sep
 
 echo -e "\nYour web service socket has to listen to"
 echo -e "localhost port 9090."
@@ -485,11 +279,8 @@ echo ""
 echo "It will be automatically mounted at every boot,"
 echo -e "reading the secret from the remote server(s).\n"
 
-if [ "$RemOpt" == '1' ]
-then
-  echo "Once you put the files in the ${WEBDOMAIN} remote web server"
-  echo "and tested here with ./getpwd,"
-fi
+echo "Once you put the files in the ${WEBDOMAIN} remote web server"
+echo "and tested here with ./getpwd,"
 echo -e "you can reboot the machine to finish the installation."
 
 sep
