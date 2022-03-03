@@ -280,7 +280,7 @@ echo "It will be automatically mounted at every boot,"
 echo -e "reading the secret from the remote server(s).\n"
 
 echo "Once you put the files in the ${WEBDOMAIN} remote web server"
-echo "and tested here with ./getpwd,"
+echo "and tested here with 'sh getpwd',"
 echo -e "you can reboot the machine to finish the installation."
 
 sep
