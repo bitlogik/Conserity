@@ -414,6 +414,8 @@ $PWD/getpwd $fileIPclients | $(type -P cryptsetup) luksOpen /root/encryptdisk01 
 mount /dev/mapper/volume1 /home/$fileUSER/protected_files
 EOF
 
+chmod +x $PWD/getpwd
+
 echo "@reboot  sleep 60 ; bash /root/mountsp.sh ; sleep 15 ; /usr/sbin/service nginx reload && openssl s_client -connect $HOSTDOMAIN:443 -status" > /var/spool/cron/crontabs/root
 echo -e "00 4 * * 1  certbot certonly --standalone  --rsa-key-size 4096 --force-renewal -n --pre-hook \"service nginx stop\" --post-hook \"service nginx start\" --server 'https://api.buypass.com/acme/directory' -d $HOSTDOMAIN" >> /var/spool/cron/crontabs/root
 crontab /var/spool/cron/crontabs/root
